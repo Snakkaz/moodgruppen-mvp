@@ -20,92 +20,69 @@ export default function ClientsPage() {
     } else {
       updated = [{ ...form, id: crypto.randomUUID(), createdAt: new Date().toISOString() }, ...clients];
     }
-    saveClients(updated);
-    setClients(updated);
-    setForm(empty());
-    setEditing(null);
-    setShowForm(false);
+    saveClients(updated); setClients(updated); setForm(empty()); setEditing(null); setShowForm(false);
   };
 
-  const remove = (id: string) => {
-    const updated = clients.filter(c => c.id !== id);
-    saveClients(updated);
-    setClients(updated);
-  };
+  const remove = (id: string) => { const u = clients.filter(c => c.id !== id); saveClients(u); setClients(u); };
+  const edit = (c: Client) => { setForm({ name: c.name, industry: c.industry, tone: c.tone, audience: c.audience, guidelines: c.guidelines }); setEditing(c.id); setShowForm(true); };
 
-  const edit = (c: Client) => {
-    setForm({ name: c.name, industry: c.industry, tone: c.tone, audience: c.audience, guidelines: c.guidelines });
-    setEditing(c.id);
-    setShowForm(true);
-  };
+  const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
+    <div><label className="block text-xs font-medium text-gray-500 mb-1.5">{label}</label>{children}</div>
+  );
+  const inputCls = "w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-colors";
 
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold">Kunder</h1>
-          <p className="text-sm text-white/40 mt-1">Administrer kundeprofiler for innholdsgenerering</p>
+          <h1 className="text-2xl font-bold text-gray-900">Kunder</h1>
+          <p className="text-sm text-gray-500 mt-1">Kundeprofiler brukes av AI-agentene for å tilpasse innhold</p>
         </div>
         <button onClick={() => { setShowForm(!showForm); setEditing(null); setForm(empty()); }}
-          className="px-4 py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-medium rounded-lg transition-colors">
+          className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg transition-colors shadow-sm">
           {showForm ? "Avbryt" : "Ny kunde"}
         </button>
       </div>
 
       {showForm && (
-        <div className="bg-[#12121a] border border-white/5 rounded-xl p-6 mb-6">
-          <h3 className="text-sm font-semibold text-white/70 uppercase tracking-wider mb-4">{editing ? "Rediger kunde" : "Ny kundeprofil"}</h3>
+        <div className="bg-white rounded-xl border border-gray-100 p-6 mb-6 shadow-sm">
+          <h3 className="text-sm font-semibold text-gray-700 mb-4">{editing ? "Rediger kunde" : "Ny kundeprofil"}</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs text-white/40 mb-1.5">Bedriftsnavn *</label>
-              <input value={form.name} onChange={e => setForm({...form, name: e.target.value})}
-                className="w-full bg-[#0a0a0f] border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white focus:border-indigo-500 focus:outline-none" placeholder="F.eks. REMA 1000"/>
-            </div>
-            <div>
-              <label className="block text-xs text-white/40 mb-1.5">Bransje *</label>
-              <input value={form.industry} onChange={e => setForm({...form, industry: e.target.value})}
-                className="w-full bg-[#0a0a0f] border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white focus:border-indigo-500 focus:outline-none" placeholder="F.eks. Dagligvare"/>
-            </div>
-            <div>
-              <label className="block text-xs text-white/40 mb-1.5">Tone of voice</label>
-              <select value={form.tone} onChange={e => setForm({...form, tone: e.target.value})}
-                className="w-full bg-[#0a0a0f] border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white focus:border-indigo-500 focus:outline-none">
+            <Field label="Bedriftsnavn"><input value={form.name} onChange={e => setForm({...form, name: e.target.value})} className={inputCls} placeholder="F.eks. REMA 1000"/></Field>
+            <Field label="Bransje"><input value={form.industry} onChange={e => setForm({...form, industry: e.target.value})} className={inputCls} placeholder="F.eks. Dagligvare"/></Field>
+            <Field label="Tone of voice">
+              <select value={form.tone} onChange={e => setForm({...form, tone: e.target.value})} className={inputCls}>
                 {TONES.map(t => <option key={t} value={t}>{t}</option>)}
               </select>
-            </div>
-            <div>
-              <label className="block text-xs text-white/40 mb-1.5">Målgruppe</label>
-              <input value={form.audience} onChange={e => setForm({...form, audience: e.target.value})}
-                className="w-full bg-[#0a0a0f] border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white focus:border-indigo-500 focus:outline-none" placeholder="F.eks. kvinner 25-45"/>
-            </div>
+            </Field>
+            <Field label="Målgruppe"><input value={form.audience} onChange={e => setForm({...form, audience: e.target.value})} className={inputCls} placeholder="F.eks. kvinner 25-45"/></Field>
             <div className="sm:col-span-2">
-              <label className="block text-xs text-white/40 mb-1.5">Brand guidelines</label>
-              <textarea value={form.guidelines} onChange={e => setForm({...form, guidelines: e.target.value})} rows={3}
-                className="w-full bg-[#0a0a0f] border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white focus:border-indigo-500 focus:outline-none resize-none"
-                placeholder="Ord å unngaa, farger, stil, referanser..."/>
+              <Field label="Brand guidelines">
+                <textarea value={form.guidelines} onChange={e => setForm({...form, guidelines: e.target.value})} rows={3} className={inputCls + " resize-none"} placeholder="Ord å unngå, farger, stil, referanser..."/>
+              </Field>
             </div>
           </div>
-          <button onClick={save} className="mt-4 px-5 py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-medium rounded-lg transition-colors">
+          <button onClick={save} className="mt-4 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg transition-colors shadow-sm">
             {editing ? "Lagre endringer" : "Opprett kunde"}
           </button>
         </div>
       )}
 
       {clients.length === 0 && !showForm ? (
-        <div className="bg-[#12121a] border border-white/5 rounded-xl p-8 text-center">
-          <p className="text-white/40">Ingen kunder ennå. Legg til din første kunde for å begynne.</p>
+        <div className="bg-white rounded-xl border border-gray-100 p-8 text-center shadow-sm">
+          <p className="text-gray-400">Ingen kunder ennå. Legg til din første kunde for å begynne.</p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-2">
           {clients.map(c => (
-            <div key={c.id} className="bg-[#12121a] border border-white/5 rounded-xl p-5 flex items-center justify-between">
+            <div key={c.id} className="bg-white rounded-xl border border-gray-100 p-5 flex items-center justify-between shadow-sm">
               <div>
-                <div className="font-medium">{c.name}</div>
-                <div className="text-xs text-white/40 mt-0.5">{c.industry} — {c.tone} — {c.audience}</div>
+                <div className="font-semibold text-gray-900">{c.name}</div>
+                <div className="text-xs text-gray-400 mt-0.5">{c.industry} — {c.tone} — {c.audience}</div>
               </div>
               <div className="flex gap-2">
-                <button onClick={() => edit(c)} className="text-xs px-3 py-1.5 bg-white/5 hover:bg-white/10 rounded-md text-white/60 transition-colors">Rediger</button>
-                <button onClick={() => remove(c.id)} className="text-xs px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 rounded-md text-red-400 transition-colors">Slett</button>
+                <button onClick={() => edit(c)} className="text-xs px-3 py-1.5 bg-gray-50 hover:bg-gray-100 rounded-lg text-gray-600 transition-colors border border-gray-200">Rediger</button>
+                <button onClick={() => remove(c.id)} className="text-xs px-3 py-1.5 bg-red-50 hover:bg-red-100 rounded-lg text-red-600 transition-colors border border-red-200">Slett</button>
               </div>
             </div>
           ))}
