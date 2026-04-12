@@ -15,7 +15,7 @@ export default function Dashboard() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
           <p className="text-sm text-gray-500 mt-1">Oversikt over AI-drevet innholdsproduksjon</p>
         </div>
         <Link href="/generate" className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg transition-colors shadow-sm">
@@ -31,8 +31,8 @@ export default function Dashboard() {
           { label: "Totalt generert", value: history.length, accent: "border-purple-400" },
           { label: "AI-agenter", value: AGENTS.length, accent: "border-amber-400" },
         ].map(s => (
-          <div key={s.label} className={`bg-white rounded-xl p-5 border border-gray-100 border-t-2 ${s.accent} shadow-sm`}>
-            <div className="text-3xl font-bold text-gray-900">{s.value}</div>
+          <div key={s.label} className={`bg-white dark:bg-gray-900 rounded-xl p-5 border border-gray-100 dark:border-gray-800 border-t-2 ${s.accent} shadow-sm`}>
+            <div className="text-3xl font-bold text-gray-900 dark:text-white">{s.value}</div>
             <div className="text-sm text-gray-500 mt-1">{s.label}</div>
           </div>
         ))}
@@ -53,7 +53,7 @@ export default function Dashboard() {
 
       {/* Empty state or recent */}
       {clients.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-100 p-8 text-center shadow-sm">
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 p-8 text-center shadow-sm">
           <p className="text-gray-400 mb-3">Ingen kunder lagt til ennå</p>
           <Link href="/clients" className="text-indigo-600 hover:text-indigo-700 text-sm font-medium">
             Legg til din første kunde for å komme i gang
@@ -64,14 +64,14 @@ export default function Dashboard() {
           <h2 className="text-lg font-semibold text-gray-900 mb-3">Siste generert</h2>
           <div className="space-y-2">
             {history.slice(0, 5).map(h => (
-              <div key={h.id} className="bg-white rounded-xl border border-gray-100 p-4 flex items-center justify-between shadow-sm">
+              <div key={h.id} className="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 p-4 flex items-center justify-between shadow-sm">
                 <div>
-                  <div className="text-sm font-medium text-gray-900">{h.clientName}</div>
+                  <div className="text-sm font-medium text-gray-900 dark:text-white">{h.clientName}</div>
                   <div className="text-xs text-gray-400 mt-0.5">{h.brief.slice(0, 50)}{h.brief.length > 50 ? "..." : ""}</div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className={`text-[11px] px-2 py-0.5 rounded-full border font-medium ${CHANNEL_COLORS[h.channel] || "bg-gray-50 text-gray-500"}`}>{h.channel}</span>
-                  <span className="text-xs text-gray-300">{new Date(h.createdAt).toLocaleDateString("nb-NO")}</span>
+                  <span className={`text-[11px] px-2 py-0.5 rounded-full border font-medium ${CHANNEL_COLORS[h.channel] || "bg-gray-50 text-gray-500 dark:text-gray-400 dark:text-gray-500"}`}>{h.channel}</span>
+                  <span className="text-xs text-gray-300 dark:text-gray-600">{new Date(h.createdAt).toLocaleDateString("nb-NO")}</span>
                 </div>
               </div>
             ))}

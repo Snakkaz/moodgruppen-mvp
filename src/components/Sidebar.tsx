@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 const nav = [
   { href: "/", label: "Dashboard", icon: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0h4" },
@@ -12,39 +13,73 @@ const nav = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const NavLinks = () => (
+    <>
+      {nav.map((n) => {
+        const active = pathname === n.href;
+        return (
+          <Link key={n.href} href={n.href} onClick={() => setMobileOpen(false)}
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all ${active
+              ? "bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300"
+              : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800"}`}>
+            <svg className="w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d={n.icon}/></svg>
+            {n.label}
+          </Link>
+        );
+      })}
+    </>
+  );
+
   return (
-    <aside className="fixed left-0 top-0 h-full w-60 bg-white dark:bg-[#0d0d14] border-r border-gray-200 dark:border-gray-800 flex flex-col z-50 max-md:hidden">
-      <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-800">
-        <h1 className="text-xl font-bold text-gray-900 dark:text-white">Mood<span className="text-indigo-600 dark:text-indigo-400">AI</span></h1>
-        <p className="text-[11px] text-gray-400 mt-0.5 tracking-wide">Multi-agent innholdsplattform</p>
+    <>
+      {/* Mobile header */}
+      <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-white dark:bg-[#0d0d14] border-b border-gray-200 dark:border-gray-800 z-50 flex items-center justify-between px-4">
+        <h1 className="text-lg font-bold text-gray-900 dark:text-white">Mood<span className="text-indigo-600 dark:text-indigo-400">AI</span></h1>
+        <button onClick={() => setMobileOpen(!mobileOpen)} className="p-2 text-gray-500 dark:text-gray-400">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            {mobileOpen
+              ? <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
+              : <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16"/>}
+          </svg>
+        </button>
       </div>
-      <nav className="flex-1 py-3 px-3 space-y-0.5">
-        {nav.map((n) => {
-          const active = pathname === n.href;
-          return (
-            <Link key={n.href} href={n.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all ${active ? "bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300" : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800"}`}>
-              <svg className="w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d={n.icon}/></svg>
-              {n.label}
-            </Link>
-          );
-        })}
-      </nav>
 
-      <div className="px-5 py-4 border-t border-gray-100 dark:border-gray-800">
-        <div className="text-[11px] text-gray-400">4 AI-agenter aktive</div>
-        <div className="flex gap-1.5 mt-2">
-          {["Strateg", "Innhold", "SEO", "Analyse"].map(a => (
-            <span key={a} className="text-[9px] px-1.5 py-0.5 bg-emerald-50 text-emerald-600 rounded font-medium">{a}</span>
-          ))}
+      {/* Mobile menu overlay */}
+      {mobileOpen && (
+        <div className="md:hidden fixed inset-0 z-40 bg-black/20" onClick={() => setMobileOpen(false)}>
+          <div className="absolute top-14 left-0 right-0 bg-white dark:bg-[#0d0d14] border-b border-gray-200 dark:border-gray-800 p-3" onClick={e => e.stopPropagation()}>
+            <NavLinks />
+          </div>
         </div>
-      </div>
+      )}
 
-      <div className="px-5 py-3 border-t border-gray-100 dark:border-gray-800">
-        <a href="https://petersendc.no" target="_blank" rel="noopener" className="text-[10px] text-gray-300 hover:text-indigo-500 transition-colors">
-          Bygget av Stian Petersen
-        </a>
-      </div>
-    </aside>
+      {/* Desktop sidebar */}
+      <aside className="fixed left-0 top-0 h-full w-60 bg-white dark:bg-[#0d0d14] border-r border-gray-200 dark:border-gray-800 flex flex-col z-50 max-md:hidden">
+        <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-800">
+          <h1 className="text-xl font-bold text-gray-900 dark:text-white">Mood<span className="text-indigo-600 dark:text-indigo-400">AI</span></h1>
+          <p className="text-[11px] text-gray-400 mt-0.5 tracking-wide">Multi-agent innholdsplattform</p>
+        </div>
+        <nav className="flex-1 py-3 px-3 space-y-0.5">
+          <NavLinks />
+        </nav>
+
+        <div className="px-5 py-4 border-t border-gray-100 dark:border-gray-800">
+          <div className="text-[11px] text-gray-400 dark:text-gray-500">4 AI-agenter aktive</div>
+          <div className="flex gap-1.5 mt-2">
+            {["Strateg", "Innhold", "SEO", "Analyse"].map(a => (
+              <span key={a} className="text-[9px] px-1.5 py-0.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded font-medium">{a}</span>
+            ))}
+          </div>
+        </div>
+
+        <div className="px-5 py-3 border-t border-gray-100 dark:border-gray-800">
+          <a href="https://petersendc.no" target="_blank" rel="noopener" className="text-[10px] text-gray-300 dark:text-gray-600 hover:text-indigo-500 transition-colors">
+            Bygget av Stian Petersen
+          </a>
+        </div>
+      </aside>
+    </>
   );
 }

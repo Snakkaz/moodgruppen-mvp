@@ -54,21 +54,21 @@ export default function GeneratePage() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Generer innhold</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Generer innhold</h1>
         <p className="text-sm text-gray-500 mt-1">4 AI-agenter samarbeider om å lage optimalt innhold</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         {/* Input panel */}
         <div className="lg:col-span-2 space-y-4">
-          <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm space-y-4">
+          <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 p-6 shadow-sm space-y-4">
             <div>
               <label className="block text-xs font-medium text-gray-500 mb-1.5">Kunde</label>
               {clients.length === 0 ? (
-                <p className="text-sm text-gray-400">Ingen kunder — <a href="/clients" className="text-indigo-600">legg til en først</a></p>
+                <p className="text-sm text-gray-400 dark:text-gray-500">Ingen kunder — <a href="/clients" className="text-indigo-600">legg til en først</a></p>
               ) : (
                 <select value={clientId} onChange={e => setClientId(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-900 focus:border-indigo-500 focus:outline-none">
+                  className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2.5 text-sm text-gray-900 dark:text-gray-100 focus:border-indigo-500 focus:outline-none">
                   <option value="">Velg kunde...</option>
                   {clients.map(c => <option key={c.id} value={c.id}>{c.name} ({c.industry})</option>)}
                 </select>
@@ -99,7 +99,7 @@ export default function GeneratePage() {
             <div>
               <label className="block text-xs font-medium text-gray-500 mb-1.5">Brief / tema</label>
               <textarea value={brief} onChange={e => setBrief(e.target.value)} rows={4}
-                className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-900 focus:border-indigo-500 focus:outline-none resize-none"
+                className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2.5 text-sm text-gray-900 dark:text-gray-100 focus:border-indigo-500 focus:outline-none resize-none"
                 placeholder="Beskriv hva innholdet skal handle om..."/>
             </div>
 
@@ -110,13 +110,13 @@ export default function GeneratePage() {
           </div>
 
           {/* Agent status */}
-          <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+          <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 p-4 shadow-sm">
             <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Agent-status</div>
             <div className="space-y-2">
               {AGENTS.map(a => (
                 <div key={a.id} className="flex items-center gap-2 text-xs">
                   <div className={`w-2 h-2 rounded-full ${loading ? "bg-amber-400 animate-pulse" : results?.[a.id] ? "bg-emerald-400" : "bg-gray-200"}`}/>
-                  <span className={results?.[a.id] ? "text-gray-900 font-medium" : "text-gray-400"}>{a.name}</span>
+                  <span className={results?.[a.id] ? "text-gray-900 font-medium" : "text-gray-400 dark:text-gray-500"}>{a.name}</span>
                   {results?.[a.id] && <span className="text-emerald-500 ml-auto">Ferdig</span>}
                 </div>
               ))}
@@ -127,13 +127,13 @@ export default function GeneratePage() {
         {/* Results panel */}
         <div className="lg:col-span-3 space-y-4">
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">{error}</div>
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 text-sm text-red-700 dark:text-red-300">{error}</div>
           )}
 
           {loading && (
-            <div className="bg-white rounded-xl border border-gray-100 p-12 shadow-sm flex flex-col items-center gap-4">
+            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 p-12 shadow-sm flex flex-col items-center gap-4">
               <div className="w-8 h-8 border-2 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"/>
-              <p className="text-sm text-gray-400">4 AI-agenter jobber parallelt...</p>
+              <p className="text-sm text-gray-400 dark:text-gray-500">4 AI-agenter jobber parallelt...</p>
             </div>
           )}
 
@@ -142,14 +142,14 @@ export default function GeneratePage() {
             if (!content) return null;
             const agent = AGENTS.find(a => a.id === agentId);
             return (
-              <div key={agentId} className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-                <div className="flex items-center justify-between px-5 py-3 border-b border-gray-50 bg-gray-50/50">
+              <div key={agentId} className="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
+                <div className="flex items-center justify-between px-5 py-3 border-b border-gray-50 bg-gray-50/50 dark:bg-gray-800/50">
                   <div className="flex items-center gap-2">
                     <div className={`text-[11px] px-2 py-0.5 rounded-full border font-medium ${agent?.color || ""}`}>{agentNames[agentId]}</div>
-                    <span className="text-xs text-gray-400">{content.length} tegn</span>
+                    <span className="text-xs text-gray-400 dark:text-gray-500">{content.length} tegn</span>
                   </div>
                   <button onClick={() => copy(content, agentId)}
-                    className="text-xs px-3 py-1 bg-white border border-gray-200 rounded-lg text-gray-500 hover:text-indigo-600 hover:border-indigo-200 transition-colors">
+                    className="text-xs px-3 py-1 bg-white border border-gray-200 dark:border-gray-700 rounded-lg text-gray-500 hover:text-indigo-600 hover:border-indigo-200 transition-colors">
                     {copied === agentId ? "Kopiert!" : "Kopier"}
                   </button>
                 </div>
@@ -161,8 +161,8 @@ export default function GeneratePage() {
           })}
 
           {!results && !loading && !error && (
-            <div className="bg-white rounded-xl border border-gray-100 p-12 shadow-sm flex items-center justify-center">
-              <p className="text-sm text-gray-300">Resultater fra alle 4 agenter vises her</p>
+            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 p-12 shadow-sm flex items-center justify-center">
+              <p className="text-sm text-gray-300 dark:text-gray-600">Resultater fra alle 4 agenter vises her</p>
             </div>
           )}
         </div>
