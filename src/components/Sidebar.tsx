@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
+import { getSettings, AGENTS } from "@/lib/store";
 
 const nav = [
   { href: "/", label: "Dashboard", icon: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0h4" },
@@ -11,13 +12,24 @@ const nav = [
   { href: "/settings", label: "Innstillinger", icon: "M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z" },
 ];
 
+const AGENT_MODELS: Record<string, string> = {
+  strategist: "Perplexity + Claude 4.5",
+  content: "Claude Sonnet 4.6",
+  seo: "Gemini 2.5 Pro",
+  analyst: "Claude Opus 4.6",
+};
+
 export default function Sidebar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dark, setDark] = useState(false);
+  const [apiConnected, setApiConnected] = useState(false);
+  const [expandAgents, setExpandAgents] = useState(false);
 
   useEffect(() => {
     setDark(document.documentElement.classList.contains("dark"));
+    const s = typeof window !== "undefined" ? JSON.parse(localStorage.getItem("mg-settings") || "{}") : {};
+    setApiConnected(!!s.apiKey);
   }, []);
 
   const toggleDark = () => {
@@ -35,7 +47,7 @@ export default function Sidebar() {
           <Link key={n.href} href={n.href} onClick={() => setMobileOpen(false)}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all ${active
               ? "bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300"
-              : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800"}`}>
+              : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-white/5"}`}>
             <svg className="w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d={n.icon}/></svg>
             {n.label}
           </Link>
@@ -47,10 +59,10 @@ export default function Sidebar() {
   return (
     <>
       {/* Mobile header */}
-      <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-white dark:bg-[#0d0d14] border-b border-gray-200 dark:border-gray-800 z-50 flex items-center justify-between px-4">
+      <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-white/70 dark:bg-black/50 backdrop-blur-xl border-b border-white/20 dark:border-white/5 z-50 flex items-center justify-between px-4">
         <h1 className="text-lg font-bold text-gray-900 dark:text-white">Mood<span className="text-indigo-600 dark:text-indigo-400">AI</span></h1>
         <div className="flex items-center gap-2">
-          <button onClick={toggleDark} className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300">
+          <button onClick={toggleDark} className="p-2 text-gray-400 dark:text-gray-500">
             {dark ? (
               <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/></svg>
             ) : (
@@ -58,46 +70,70 @@ export default function Sidebar() {
             )}
           </button>
           <button onClick={() => setMobileOpen(!mobileOpen)} className="p-2 text-gray-500 dark:text-gray-400">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-            {mobileOpen
-              ? <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
-              : <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16"/>}
-          </svg>
-        </button>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              {mobileOpen ? <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/> : <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16"/>}
+            </svg>
+          </button>
         </div>
       </div>
 
-      {/* Mobile menu overlay */}
       {mobileOpen && (
         <div className="md:hidden fixed inset-0 z-40 bg-black/20" onClick={() => setMobileOpen(false)}>
-          <div className="absolute top-14 left-0 right-0 bg-white dark:bg-[#0d0d14] border-b border-gray-200 dark:border-gray-800 p-3" onClick={e => e.stopPropagation()}>
+          <div className="absolute top-14 left-0 right-0 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border-b border-white/20 p-3" onClick={e => e.stopPropagation()}>
             <NavLinks />
           </div>
         </div>
       )}
 
       {/* Desktop sidebar */}
-      <aside className="fixed left-0 top-0 h-full w-60 bg-white dark:bg-[#0d0d14] border-r border-gray-200 dark:border-gray-800 flex flex-col z-50 max-md:hidden">
-        <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-800">
+      <aside className="fixed left-0 top-0 h-full w-60 bg-white/60 dark:bg-black/30 backdrop-blur-xl border-r border-white/20 dark:border-white/5 flex flex-col z-50 max-md:hidden">
+        <div className="px-6 py-5 border-b border-white/20 dark:border-white/5">
           <h1 className="text-xl font-bold text-gray-900 dark:text-white">Mood<span className="text-indigo-600 dark:text-indigo-400">AI</span></h1>
           <p className="text-[11px] text-gray-400 mt-0.5 tracking-wide">Multi-agent innholdsplattform</p>
         </div>
-        <nav className="flex-1 py-3 px-3 space-y-0.5">
+
+        <nav className="flex-1 py-3 px-3 space-y-0.5 overflow-y-auto">
           <NavLinks />
+
+          {/* Agent panel */}
+          <div className="mt-4 pt-3 border-t border-white/15 dark:border-white/5">
+            <button onClick={() => setExpandAgents(!expandAgents)}
+              className="w-full flex items-center justify-between px-3 py-2 text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+              <span>Agenter</span>
+              <svg className={`w-3.5 h-3.5 transition-transform ${expandAgents ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </button>
+
+            {expandAgents && (
+              <div className="mt-1 space-y-1.5">
+                {AGENTS.map(a => (
+                  <div key={a.id} className="px-2 py-2 rounded-lg bg-white/30 dark:bg-white/5 border border-white/20 dark:border-white/5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-semibold text-gray-700 dark:text-gray-300">{a.name}</span>
+                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" title="Klar"/>
+                    </div>
+                    <div className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{AGENT_MODELS[a.id]}</div>
+                    <div className="text-[9px] text-gray-300 dark:text-gray-600 mt-0.5 italic">{a.desc}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </nav>
 
-        <div className="px-5 py-4 border-t border-gray-100 dark:border-gray-800">
-          <div className="text-[11px] text-gray-400 dark:text-gray-500">4 AI-agenter aktive</div>
-          <div className="flex gap-1.5 mt-2">
-            {["Strateg", "Innhold", "SEO", "Analyse"].map(a => (
-              <span key={a} className="text-[9px] px-1.5 py-0.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded font-medium">{a}</span>
-            ))}
+        {/* API status */}
+        <div className="px-4 py-3 border-t border-white/15 dark:border-white/5">
+          <div className="flex items-center gap-2">
+            <div className={`w-2 h-2 rounded-full ${apiConnected ? "bg-emerald-400" : "bg-red-400 animate-pulse"}`}/>
+            <span className="text-[11px] text-gray-500 dark:text-gray-400">{apiConnected ? "API tilkoblet" : "Ingen API-nøkkel"}</span>
           </div>
         </div>
 
-        <div className="px-5 py-3 border-t border-gray-100 dark:border-gray-800">
+        {/* Dark mode toggle */}
+        <div className="px-3 py-2 border-t border-white/15 dark:border-white/5">
           <button onClick={toggleDark}
-            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800 transition-all">
+            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-white/40 dark:hover:bg-white/5 transition-all">
             {dark ? (
               <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/></svg>
             ) : (
@@ -107,7 +143,7 @@ export default function Sidebar() {
           </button>
         </div>
 
-        <div className="px-5 py-3 border-t border-gray-100 dark:border-gray-800">
+        <div className="px-5 py-2 border-t border-white/15 dark:border-white/5">
           <a href="https://petersendc.no" target="_blank" rel="noopener" className="text-[10px] text-gray-300 dark:text-gray-600 hover:text-indigo-500 transition-colors">
             Bygget av Stian Petersen
           </a>
