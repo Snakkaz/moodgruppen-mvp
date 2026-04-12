@@ -7,7 +7,6 @@
   --text: #1a1a2e;
   --muted: #6b7280;
   --accent: #4f46e5;
-  --accent-light: #eef2ff;
 }
 
 body {
@@ -17,3 +16,7 @@ body {
 }
 
 ::selection { background: rgba(79,70,229,.15); }
+
+/* Dark mode */
+.dark body, .dark main { background: #0a0a0f; color: #e4e4e7; }
+.dark { color-scheme: dark; }
