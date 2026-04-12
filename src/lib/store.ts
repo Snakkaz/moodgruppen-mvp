@@ -42,6 +42,8 @@ export const CHANNEL_ICONS: Record<string, string> = {
   "Google Ads": `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.005 14.453l6.217-10.78 4.244 2.45L7.249 16.9zM16.148 24a3.86 3.86 0 003.86-3.86 3.86 3.86 0 00-3.86-3.86 3.86 3.86 0 00-3.86 3.86A3.86 3.86 0 0016.148 24zM16.633 13.37L10.416 2.59a3.861 3.861 0 00-5.275-1.413A3.861 3.861 0 003.73 6.453l6.217 10.78z"/></svg>`,
   "Blogginnlegg": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>`,
 };
+
+export const CHANNEL_COLORS: Record<string, string> = {
   "Instagram Post": "bg-pink-50 text-pink-700 border-pink-200",
   "LinkedIn Post": "bg-blue-50 text-blue-700 border-blue-200",
   "Facebook Ad": "bg-indigo-50 text-indigo-700 border-indigo-200",
