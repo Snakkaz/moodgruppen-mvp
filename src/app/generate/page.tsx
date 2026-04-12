@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { getClients, getHistory, saveHistory, getSettings, CHANNELS, CHANNEL_COLORS, AGENTS, type Client, type ContentItem } from "@/lib/store";
+import { getClients, getHistory, saveHistory, getSettings, CHANNELS, CHANNEL_COLORS, CHANNEL_ICONS, AGENTS, type Client, type ContentItem } from "@/lib/store";
 
 export default function GeneratePage() {
   const [clients, setClients] = useState<Client[]>([]);
@@ -83,13 +83,14 @@ export default function GeneratePage() {
             )}
 
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1.5">Kanal</label>
+              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">Kanal</label>
               <div className="grid grid-cols-2 gap-2">
                 {CHANNELS.map(ch => (
                   <button key={ch} onClick={() => setChannel(ch)}
-                    className={`px-3 py-2 rounded-lg text-xs font-medium transition-all border ${channel === ch
+                    className={`px-3 py-2.5 rounded-lg text-xs font-medium transition-all border flex items-center gap-2 ${channel === ch
                       ? (CHANNEL_COLORS[ch] || "bg-indigo-50 text-indigo-700 border-indigo-200")
-                      : "bg-white border-gray-200 text-gray-400 hover:text-gray-600 hover:border-gray-300"}`}>
+                      : "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:text-gray-600 hover:border-gray-300"}`}>
+                    <span className="w-4 h-4 flex-shrink-0" dangerouslySetInnerHTML={{ __html: CHANNEL_ICONS[ch] || "" }} />
                     {ch}
                   </button>
                 ))}
