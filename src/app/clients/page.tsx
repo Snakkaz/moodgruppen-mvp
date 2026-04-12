@@ -74,7 +74,7 @@ export default function ClientsPage() {
               </select>
             </div>
             <div>
-              <label className="block text-xs text-white/40 mb-1.5">Maalgruppe</label>
+              <label className="block text-xs text-white/40 mb-1.5">Målgruppe</label>
               <input value={form.audience} onChange={e => setForm({...form, audience: e.target.value})}
                 className="w-full bg-[#0a0a0f] border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white focus:border-indigo-500 focus:outline-none" placeholder="F.eks. kvinner 25-45"/>
             </div>
@@ -82,7 +82,7 @@ export default function ClientsPage() {
               <label className="block text-xs text-white/40 mb-1.5">Brand guidelines</label>
               <textarea value={form.guidelines} onChange={e => setForm({...form, guidelines: e.target.value})} rows={3}
                 className="w-full bg-[#0a0a0f] border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white focus:border-indigo-500 focus:outline-none resize-none"
-                placeholder="Ord aa unngaa, farger, stil, referanser..."/>
+                placeholder="Ord å unngaa, farger, stil, referanser..."/>
             </div>
           </div>
           <button onClick={save} className="mt-4 px-5 py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-medium rounded-lg transition-colors">
@@ -93,7 +93,7 @@ export default function ClientsPage() {
 
       {clients.length === 0 && !showForm ? (
         <div className="bg-[#12121a] border border-white/5 rounded-xl p-8 text-center">
-          <p className="text-white/40">Ingen kunder enda. Legg til din forste kunde for aa begynne.</p>
+          <p className="text-white/40">Ingen kunder ennå. Legg til din første kunde for å begynne.</p>
         </div>
       ) : (
         <div className="space-y-3">
