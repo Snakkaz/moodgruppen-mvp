@@ -14,6 +14,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+        <script dangerouslySetInnerHTML={{ __html: `try{if(localStorage.getItem("mg-dark")==="1")document.documentElement.classList.add("dark")}catch(e){}` }} />
       </head>
       <body className="antialiased bg-[#fafafa] dark:bg-[#0a0a0f] text-gray-900 dark:text-gray-100 transition-colors">
         <DarkModeInit />
