@@ -1,13 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { GlassCard, GlassButton, GlassTextarea, GlassSelect } from "@/components/ui/glass";
+import { GlassCard, GlassButton, GlassTextarea, GlassSelect, GlassBadge } from "@/components/ui/glass";
 
 const STYLES = ["Ingen", "Fotorealistisk", "Illustrasjon", "Logo", "Minimalistisk", "Abstrakt"];
+
+const IMAGE_PROVIDERS = [
+  { id: "demo", name: "Demo (Gemini Image)", available: true },
+  { id: "gemini", name: "Google Gemini", available: true },
+  { id: "dalle", name: "DALL-E 3 (OpenAI)", available: false },
+  { id: "midjourney", name: "Midjourney", available: false },
+];
 
 export default function ImagePage() {
   const [prompt, setPrompt] = useState("");
   const [style, setStyle] = useState("Ingen");
+  const [provider, setProvider] = useState("demo");
   const [loading, setLoading] = useState(false);
   const [image, setImage] = useState<string | null>(null);
   const [description, setDescription] = useState<string | null>(null);
@@ -24,7 +32,7 @@ export default function ImagePage() {
       const res = await fetch("/api/image", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: prompt.trim(), style: style !== "Ingen" ? style : undefined }),
+        body: JSON.stringify({ prompt: prompt.trim(), style: style !== "Ingen" ? style : undefined, provider }),
       });
       const data = await res.json();
       if (data.error) {
@@ -76,6 +84,29 @@ export default function ImagePage() {
               <option key={s} value={s}>{s}</option>
             ))}
           </GlassSelect>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Leverandør</label>
+          <div className="grid grid-cols-2 gap-2">
+            {IMAGE_PROVIDERS.map(p => (
+              <button
+                key={p.id}
+                onClick={() => p.available && setProvider(p.id)}
+                disabled={!p.available}
+                className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs transition-all border ${
+                  provider === p.id
+                    ? "bg-indigo-500/10 border-indigo-500/30 text-indigo-600 dark:text-indigo-400 font-medium"
+                    : p.available
+                      ? "bg-white/30 dark:bg-white/5 border-white/20 dark:border-white/10 text-gray-600 dark:text-gray-400 hover:bg-white/50 cursor-pointer"
+                      : "bg-white/10 dark:bg-white/[0.02] border-white/10 text-gray-400 dark:text-gray-600 cursor-not-allowed"
+                }`}
+              >
+                <span>{p.name}</span>
+                {!p.available && <GlassBadge className="bg-gray-500/15 text-gray-400 border-gray-500/20 text-[9px]">Planlagt</GlassBadge>}
+              </button>
+            ))}
+          </div>
         </div>
 
         <GlassButton variant="primary" size="lg" onClick={generate} disabled={loading || !prompt.trim()} className="w-full">
