@@ -6,6 +6,12 @@ import { GlassCard, GlassButton, GlassInput, GlassSelect, GlassTextarea, GlassBa
 const PROVIDERS = [
   { id: "", name: "Velg leverandør...", placeholder: "", models: [] },
   {
+    id: "openclaw",
+    name: "OpenClaw (innebygd)",
+    placeholder: "Innebygd",
+    models: ["openclaw/default"],
+  },
+  {
     id: "demo",
     name: "Demo (Gemma — gratis)",
     placeholder: "Innebygd",
@@ -314,13 +320,13 @@ function AgentConfigCard({ agent, config, colors, onUpdate }: {
                     ...config,
                     primaryProvider: e.target.value,
                     primaryModel: prov?.models[0] || "",
-                    primaryApiKey: e.target.value === "demo" ? "demo" : config.primaryApiKey,
+                    primaryApiKey: (e.target.value === "demo" || e.target.value === "openclaw") ? "demo" : config.primaryApiKey,
                   });
                 }}
               >
                 {PROVIDERS.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
               </GlassSelect>
-              {config.primaryProvider === "demo" ? (
+              {config.primaryProvider === "demo" || config.primaryProvider === "openclaw" ? (
                 <GlassInput value="Innebygd nøkkel" disabled className="opacity-50" />
               ) : (
                 <GlassInput
@@ -364,13 +370,13 @@ function AgentConfigCard({ agent, config, colors, onUpdate }: {
                     ...config,
                     secondaryProvider: e.target.value,
                     secondaryModel: prov?.models[0] || "",
-                    secondaryApiKey: e.target.value === "demo" ? "demo" : config.secondaryApiKey,
+                    secondaryApiKey: (e.target.value === "demo" || e.target.value === "openclaw") ? "demo" : config.secondaryApiKey,
                   });
                 }}
               >
                 {PROVIDERS.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
               </GlassSelect>
-              {config.secondaryProvider === "demo" ? (
+              {config.secondaryProvider === "demo" || config.secondaryProvider === "openclaw" ? (
                 <GlassInput value="Innebygd nøkkel" disabled className="opacity-50" />
               ) : (
                 <GlassInput
@@ -713,19 +719,6 @@ export default function SettingsPage() {
         onUpdate={(ms) => { setMediaSettings(ms); saveMediaSettings(ms); setSaved(true); setTimeout(() => setSaved(false), 1500); }}
       />
 
-      {/* Provider reference */}
-      <GlassCard className="p-5">
-        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-4">Leverandør-oversikt (2026)</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-          {PROVIDERS.filter(p => p.id).map(p => (
-            <div key={p.id} className="p-3 rounded-lg bg-white/30 dark:bg-white/5 border border-white/20 dark:border-white/10">
-              <div className="text-xs font-semibold text-gray-800 dark:text-gray-200">{p.name}</div>
-              <div className="text-[10px] text-gray-500 dark:text-gray-400 mt-1">{p.models.length} modeller</div>
-              <div className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5 truncate">{p.models[0]}</div>
-            </div>
-          ))}
-        </div>
-      </GlassCard>
     </div>
   );
 }

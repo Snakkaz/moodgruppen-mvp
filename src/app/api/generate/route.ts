@@ -61,6 +61,27 @@ async function callAI(
   if (!apiKey || !model || !provider) return null;
 
   try {
+    // --- OpenClaw proxy (GitHub Copilot via OpenClaw gateway) ---
+    if (provider === "openclaw") {
+      const res = await fetch("http://localhost:18790/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer Jesus123!",
+        },
+        body: JSON.stringify({
+          model: model || "openclaw/default",
+          messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userMessage }],
+          temperature: 0.8,
+          max_tokens: 1500,
+        }),
+        signal: AbortSignal.timeout(FETCH_TIMEOUT),
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.choices?.[0]?.message?.content || null;
+    }
+
     // --- Anthropic Messages API ---
     if (provider === "anthropic") {
       const res = await fetch("https://api.anthropic.com/v1/messages", {
