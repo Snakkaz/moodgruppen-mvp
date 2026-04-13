@@ -37,6 +37,22 @@ export interface AgentConfig {
 
 export type AgentSettings = Record<string, AgentConfig>;
 
+export interface MediaConfig {
+  provider: string;
+  apiKey: string;
+  model: string;
+}
+
+export interface MediaSettings {
+  image: MediaConfig;
+  video: MediaConfig;
+}
+
+export const DEFAULT_MEDIA_SETTINGS: MediaSettings = {
+  image: { provider: "demo", apiKey: "demo", model: "gemini-2.5-flash-image" },
+  video: { provider: "demo", apiKey: "demo", model: "gemma-3-4b-it" },
+};
+
 export const TONES = ["Formell", "Uformell", "Profesjonell", "Leken", "Autoritativ"] as const;
 
 export const CHANNELS = ["Instagram Post", "LinkedIn Post", "Facebook Ad", "Google Ads", "Blogginnlegg"] as const;
@@ -103,4 +119,13 @@ export function getAgentSettings(): AgentSettings {
 
 export function saveAgentSettings(settings: AgentSettings) {
   localStorage.setItem("mg-agent-settings", JSON.stringify(settings));
+}
+
+export function getMediaSettings(): MediaSettings {
+  if (typeof window === "undefined") return DEFAULT_MEDIA_SETTINGS;
+  return JSON.parse(localStorage.getItem("mg-media-settings") || JSON.stringify(DEFAULT_MEDIA_SETTINGS));
+}
+
+export function saveMediaSettings(settings: MediaSettings) {
+  localStorage.setItem("mg-media-settings", JSON.stringify(settings));
 }

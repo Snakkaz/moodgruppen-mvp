@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { GlassCard, GlassButton, GlassTextarea, GlassSelect, GlassBadge } from "@/components/ui/glass";
+import { getMediaSettings } from "@/lib/store";
 
 const STYLES = ["Ingen", "Fotorealistisk", "Illustrasjon", "Logo", "Minimalistisk", "Abstrakt"];
 
@@ -32,7 +33,13 @@ export default function ImagePage() {
       const res = await fetch("/api/image", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: prompt.trim(), style: style !== "Ingen" ? style : undefined, provider }),
+        body: JSON.stringify({
+          prompt: prompt.trim(),
+          style: style !== "Ingen" ? style : undefined,
+          provider,
+          model: getMediaSettings().image.model,
+          apiKey: getMediaSettings().image.apiKey,
+        }),
       });
       const data = await res.json();
       if (data.error) {

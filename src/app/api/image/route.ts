@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
   try {
-    const { prompt, style, provider } = await req.json();
+    const { prompt, style, provider, model: requestModel, apiKey: requestApiKey } = await req.json();
 
     if (!prompt || typeof prompt !== 'string') {
       return NextResponse.json({ error: 'Prompt er påkrevd' }, { status: 400 });
@@ -10,12 +10,12 @@ export async function POST(req: Request) {
 
     const fullPrompt = style && style !== 'Ingen' ? `${style} stil: ${prompt}` : prompt;
 
-    const apiKey = process.env.DEMO_GEMINI_KEY;
+    const apiKey = requestApiKey && requestApiKey !== "demo" ? requestApiKey : process.env.DEMO_GEMINI_KEY;
     if (!apiKey) {
       return NextResponse.json({ error: 'Gemini API-nøkkel er ikke konfigurert' }, { status: 500 });
     }
 
-    const model = 'gemini-2.5-flash-image';
+    const model = requestModel || 'gemini-2.5-flash-image';
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
     const controller = new AbortController();

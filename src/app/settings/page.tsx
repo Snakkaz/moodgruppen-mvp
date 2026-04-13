@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
-import { getAgentSettings, saveAgentSettings, AGENTS, DEFAULT_SOULS, type AgentSettings, type AgentConfig } from "@/lib/store";
+import { getAgentSettings, saveAgentSettings, getMediaSettings, saveMediaSettings, AGENTS, DEFAULT_SOULS, DEFAULT_MEDIA_SETTINGS, type AgentSettings, type AgentConfig, type MediaSettings } from "@/lib/store";
 import { GlassCard, GlassButton, GlassInput, GlassSelect, GlassTextarea, GlassBadge } from "@/components/ui/glass";
 
 const PROVIDERS = [
@@ -413,10 +413,12 @@ function AgentConfigCard({ agent, config, colors, onUpdate }: {
 
 export default function SettingsPage() {
   const [agentSettings, setAgentSettings] = useState<AgentSettings>({});
+  const [mediaSettings, setMediaSettings] = useState<MediaSettings>(DEFAULT_MEDIA_SETTINGS);
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     setAgentSettings(getAgentSettings());
+    setMediaSettings(getMediaSettings());
   }, []);
 
   const updateAgent = (agentId: string, config: AgentConfig) => {
@@ -506,6 +508,120 @@ export default function SettingsPage() {
           />
         ))}
       </div>
+
+      {/* Bilde & Video innstillinger */}
+      <GlassCard className="p-5 space-y-5">
+        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">Bilde & Video — API-konfigurasjon</h3>
+
+        {/* Bilde */}
+        <div className="space-y-2 p-4 rounded-lg bg-purple-500/5 dark:bg-purple-500/10 border border-purple-500/20">
+          <label className="text-xs font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-wider">Bildegenerering</label>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <GlassSelect
+              value={mediaSettings.image.provider}
+              onChange={e => {
+                const ms = { ...mediaSettings, image: { ...mediaSettings.image, provider: e.target.value, apiKey: e.target.value === "demo" ? "demo" : mediaSettings.image.apiKey } };
+                setMediaSettings(ms); saveMediaSettings(ms); setSaved(true); setTimeout(() => setSaved(false), 1500);
+              }}
+            >
+              <option value="demo">Demo (Gemini — gratis)</option>
+              <option value="gemini">Google Gemini</option>
+              <option value="dalle">OpenAI DALL-E</option>
+              <option value="midjourney">Midjourney</option>
+            </GlassSelect>
+            {mediaSettings.image.provider === "demo" ? (
+              <GlassInput value="Innebygd nøkkel" disabled className="opacity-50" />
+            ) : (
+              <GlassInput
+                type="password"
+                placeholder="API-nøkkel"
+                value={mediaSettings.image.apiKey}
+                onChange={e => {
+                  const ms = { ...mediaSettings, image: { ...mediaSettings.image, apiKey: e.target.value } };
+                  setMediaSettings(ms); saveMediaSettings(ms); setSaved(true); setTimeout(() => setSaved(false), 1500);
+                }}
+              />
+            )}
+            <GlassSelect
+              value={mediaSettings.image.model}
+              onChange={e => {
+                const ms = { ...mediaSettings, image: { ...mediaSettings.image, model: e.target.value } };
+                setMediaSettings(ms); saveMediaSettings(ms); setSaved(true); setTimeout(() => setSaved(false), 1500);
+              }}
+            >
+              <optgroup label="Gemini Image">
+                <option value="gemini-2.5-flash-image">Gemini 2.5 Flash Image</option>
+                <option value="gemini-3.1-flash-image-preview">Nano Banana 2 (gemini-3.1-flash)</option>
+                <option value="gemini-3-pro-image-preview">Gemini 3 Pro Image</option>
+              </optgroup>
+              <optgroup label="Imagen">
+                <option value="imagen-4.0-generate-001">Imagen 4.0</option>
+                <option value="imagen-4.0-fast-generate-001">Imagen 4.0 Fast</option>
+                <option value="imagen-4.0-ultra-generate-001">Imagen 4.0 Ultra</option>
+              </optgroup>
+              <optgroup label="Andre">
+                <option value="dall-e-3">DALL-E 3</option>
+              </optgroup>
+            </GlassSelect>
+          </div>
+        </div>
+
+        {/* Video */}
+        <div className="space-y-2 p-4 rounded-lg bg-rose-500/5 dark:bg-rose-500/10 border border-rose-500/20">
+          <label className="text-xs font-semibold text-rose-600 dark:text-rose-400 uppercase tracking-wider">Videogenerering</label>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <GlassSelect
+              value={mediaSettings.video.provider}
+              onChange={e => {
+                const ms = { ...mediaSettings, video: { ...mediaSettings.video, provider: e.target.value, apiKey: e.target.value === "demo" ? "demo" : mediaSettings.video.apiKey } };
+                setMediaSettings(ms); saveMediaSettings(ms); setSaved(true); setTimeout(() => setSaved(false), 1500);
+              }}
+            >
+              <option value="demo">Demo (AI Storyboard)</option>
+              <option value="kling">Kling AI</option>
+              <option value="veo">Google Veo 3.1</option>
+              <option value="runway">Runway Gen 4.5</option>
+              <option value="pixverse">PixVerse</option>
+              <option value="luma">Luma Dream Machine</option>
+            </GlassSelect>
+            {mediaSettings.video.provider === "demo" ? (
+              <GlassInput value="Innebygd nøkkel" disabled className="opacity-50" />
+            ) : (
+              <GlassInput
+                type="password"
+                placeholder="API-nøkkel"
+                value={mediaSettings.video.apiKey}
+                onChange={e => {
+                  const ms = { ...mediaSettings, video: { ...mediaSettings.video, apiKey: e.target.value } };
+                  setMediaSettings(ms); saveMediaSettings(ms); setSaved(true); setTimeout(() => setSaved(false), 1500);
+                }}
+              />
+            )}
+            <GlassSelect
+              value={mediaSettings.video.model}
+              onChange={e => {
+                const ms = { ...mediaSettings, video: { ...mediaSettings.video, model: e.target.value } };
+                setMediaSettings(ms); saveMediaSettings(ms); setSaved(true); setTimeout(() => setSaved(false), 1500);
+              }}
+            >
+              <optgroup label="Demo">
+                <option value="gemma-3-4b-it">Gemma 3 4B (storyboard)</option>
+                <option value="gemma-3-27b-it">Gemma 3 27B (storyboard)</option>
+                <option value="gemma-4-31b-it">Gemma 4 31B (storyboard)</option>
+              </optgroup>
+              <optgroup label="Kling">
+                <option value="kling-v2">Kling v2</option>
+              </optgroup>
+              <optgroup label="Google">
+                <option value="veo-3.1">Veo 3.1</option>
+              </optgroup>
+              <optgroup label="Runway">
+                <option value="gen-4.5-turbo">Gen 4.5 Turbo</option>
+              </optgroup>
+            </GlassSelect>
+          </div>
+        </div>
+      </GlassCard>
 
       {/* Provider reference */}
       <GlassCard className="p-5">
