@@ -1,36 +1,17 @@
 "use client";
 import { useEffect, useState } from "react";
-import { getAgentSettings, saveAgentSettings } from "@/lib/store";
+import { getAgentSettings, saveAgentSettings, type AgentSettings } from "@/lib/store";
 
 export default function SettingsPage() {
   const [agentSettings, setAgentSettings] = useState(getAgentSettings());
 
   const enableDemoMode = () => {
-    const demoSettings = {
-      strategist: {
-        primaryProvider: "demo",
-        primaryModel: "gemma-3-12b-it",
-        secondaryProvider: "demo",
-        secondaryModel: "gemma-3-4b-it",
-      },
-      content: {
-        primaryProvider: "demo",
-        primaryModel: "gemma-3-27b-it",
-        secondaryProvider: "demo",
-        secondaryModel: "gemma-3-12b-it",
-      },
-      seo: {
-        primaryProvider: "demo",
-        primaryModel: "gemma-3-12b-it",
-        secondaryProvider: "demo",
-        secondaryModel: "gemma-3-4b-it",
-      },
-      analyst: {
-        primaryProvider: "demo",
-        primaryModel: "gemma-4-31b-it",
-        secondaryProvider: "demo",
-        secondaryModel: "gemma-3-12b-it",
-      },
+    const base = { primaryApiKey: "demo", secondaryApiKey: "demo", soul: "" };
+    const demoSettings: AgentSettings = {
+      strategist: { ...base, primaryProvider: "demo", primaryModel: "gemma-3-12b-it", secondaryProvider: "demo", secondaryModel: "gemma-3-4b-it" },
+      content: { ...base, primaryProvider: "demo", primaryModel: "gemma-3-27b-it", secondaryProvider: "demo", secondaryModel: "gemma-3-12b-it" },
+      seo: { ...base, primaryProvider: "demo", primaryModel: "gemma-3-12b-it", secondaryProvider: "demo", secondaryModel: "gemma-3-4b-it" },
+      analyst: { ...base, primaryProvider: "demo", primaryModel: "gemma-4-31b-it", secondaryProvider: "demo", secondaryModel: "gemma-3-12b-it" },
     };
     saveAgentSettings(demoSettings);
     setAgentSettings(demoSettings);

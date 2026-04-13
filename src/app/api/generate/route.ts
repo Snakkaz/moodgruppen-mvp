@@ -34,22 +34,26 @@ async function callAI(
   model: string,
   provider: string
 ): Promise<string | null> {
-  if (!apiKey || !model || !provider) {
-    if (provider === "demo" || (!apiKey && process.env.DEMO_GEMINI_KEY)) {
-      const demoKey = process.env.DEMO_GEMINI_KEY;
-      const demoModel = model || "gemma-3-12b-it";
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${demoModel}:generateContent?key=${demoKey}`;
+  // Demo mode — use Gemma via Gemini API
+  if (provider === "demo") {
+    const demoKey = process.env.DEMO_GEMINI_KEY;
+    if (!demoKey) return null;
+    const demoModel = model || "gemma-3-12b-it";
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${demoModel}:generateContent?key=${demoKey}`;
+    try {
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt + "\n\n" + userMessage }] }] }),
+        signal: AbortSignal.timeout(30000),
       });
       if (!res.ok) return null;
       const data = await res.json();
       return data.candidates?.[0]?.content?.parts?.[0]?.text || null;
-    }
-    return null;
+    } catch { return null; }
   }
+
+  if (!apiKey || !model || !provider) return null;
 
   try {
     if (provider === "anthropic") {
