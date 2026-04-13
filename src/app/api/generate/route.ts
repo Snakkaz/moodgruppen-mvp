@@ -13,11 +13,11 @@ const AGENT_PROMPTS: Record<string, (client: Record<string, string>, channel: st
       "Google Ads": "Skriv 3 overskrifter (maks 30 tegn) og 2 beskrivelser (maks 90 tegn).",
       "Blogginnlegg": "Skriv et blogginnlegg (500-800 ord) med overskrifter og struktur.",
     };
-    return `Du er en erfaren innholdsprodusent i et norsk markedsforingsbyraa. Skriv innhold for ${client.name} (${client.industry}).
-Tone of voice: ${client.tone}. Maalgruppe: ${client.audience || "Ikke spesifisert"}.
+    return `Du er en erfaren innholdsprodusent i et norsk byraa. Skriv innhold for ${client.name} (${client.industry}).
+Tone: ${client.tone}. Maalgruppe: ${client.audience || "Ikke spesifisert"}.
 ${client.guidelines ? `Brand guidelines: ${client.guidelines}` : ""}
 ${channelGuide[channel] || "Skriv tilpasset innhold."}
-Skriv KUN innholdet paa norsk. Ingen meta-tekst eller forklaringer.`;
+Skriv KUN innholdet paa norsk. Ingen meta-tekst.`;
   },
 
   seo: (client, channel) =>
@@ -27,6 +27,8 @@ Skriv KUN innholdet paa norsk. Ingen meta-tekst eller forklaringer.`;
     `Du er en markedsanalytiker. Gi en kort evaluering (3-4 punkter) av ${channel}-innhold for ${client.name}. Vurder: maalgruppetreff, tone-konsistens, CTA-styrke, og forbedringsforslag. Maks 100 ord. Skriv paa norsk.`,
 };
 
+const FETCH_TIMEOUT = 25000;
+
 async function callAI(
   systemPrompt: string,
   userMessage: string,
@@ -34,18 +36,18 @@ async function callAI(
   model: string,
   provider: string
 ): Promise<string | null> {
-  // Demo mode — use Gemma via Gemini API
+  // Demo mode — Gemma via Gemini API
   if (provider === "demo") {
     const demoKey = process.env.DEMO_GEMINI_KEY;
     if (!demoKey) return null;
-    const demoModel = model || "gemma-3-12b-it";
+    const demoModel = model || "gemma-3-4b-it";
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${demoModel}:generateContent?key=${demoKey}`;
     try {
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt + "\n\n" + userMessage }] }] }),
-        signal: AbortSignal.timeout(30000),
+        signal: AbortSignal.timeout(FETCH_TIMEOUT),
       });
       if (!res.ok) return null;
       const data = await res.json();
@@ -56,6 +58,7 @@ async function callAI(
   if (!apiKey || !model || !provider) return null;
 
   try {
+    // --- Anthropic Messages API ---
     if (provider === "anthropic") {
       const res = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
@@ -69,12 +72,14 @@ async function callAI(
           max_tokens: 1500,
           messages: [{ role: "user", content: systemPrompt + "\n\n" + userMessage }],
         }),
+        signal: AbortSignal.timeout(FETCH_TIMEOUT),
       });
       if (!res.ok) return null;
       const data = await res.json();
       return data.content?.[0]?.text || null;
     }
 
+    // --- Google Gemini ---
     if (provider === "google") {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
       const res = await fetch(url, {
@@ -83,13 +88,88 @@ async function callAI(
         body: JSON.stringify({
           contents: [{ parts: [{ text: systemPrompt + "\n\n" + userMessage }] }],
         }),
+        signal: AbortSignal.timeout(FETCH_TIMEOUT),
       });
       if (!res.ok) return null;
       const data = await res.json();
       return data.candidates?.[0]?.content?.parts?.[0]?.text || null;
     }
 
-    return null;
+    // --- DeepSeek ---
+    if (provider === "deepseek") {
+      const res = await fetch("https://api.deepseek.com/chat/completions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+        body: JSON.stringify({
+          model,
+          messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userMessage }],
+          temperature: 0.8, max_tokens: 1500,
+        }),
+        signal: AbortSignal.timeout(FETCH_TIMEOUT),
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.choices?.[0]?.message?.content || null;
+    }
+
+    // --- xAI (Grok) ---
+    if (provider === "xai") {
+      const res = await fetch("https://api.x.ai/v1/chat/completions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+        body: JSON.stringify({
+          model,
+          messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userMessage }],
+          temperature: 0.8, max_tokens: 1500,
+        }),
+        signal: AbortSignal.timeout(FETCH_TIMEOUT),
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.choices?.[0]?.message?.content || null;
+    }
+
+    // --- Ollama (lokal) ---
+    if (provider === "ollama") {
+      const baseUrl = apiKey.startsWith("http") ? apiKey : "http://localhost:11434";
+      const res = await fetch(`${baseUrl}/api/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model,
+          messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userMessage }],
+          stream: false,
+        }),
+        signal: AbortSignal.timeout(FETCH_TIMEOUT),
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.message?.content || null;
+    }
+
+    // --- OpenAI-compatible (GitHub Models, OpenAI, Groq, Perplexity, MiniMax) ---
+    const urls: Record<string, string> = {
+      github: "https://models.github.ai/inference/chat/completions",
+      openai: "https://api.openai.com/v1/chat/completions",
+      groq: "https://api.groq.com/openai/v1/chat/completions",
+      perplexity: "https://api.perplexity.ai/chat/completions",
+      minimax: "https://api.minimax.chat/v1/text/chatcompletion_v2",
+    };
+    const url = urls[provider] || urls.openai;
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+      body: JSON.stringify({
+        model,
+        messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userMessage }],
+        temperature: 0.8, max_tokens: 1500,
+      }),
+      signal: AbortSignal.timeout(FETCH_TIMEOUT),
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.choices?.[0]?.message?.content || null;
   } catch {
     return null;
   }
@@ -111,7 +191,7 @@ export async function POST(req: NextRequest) {
       if (!config) return;
 
       const promptFn = AGENT_PROMPTS[agent.id];
-      const systemPrompt = config.soul || DEFAULT_SOULS[agent.id] || "Du er en hjelpsom AI-assistent.";
+      const systemPrompt = config.soul || (promptFn ? promptFn(client, channel) : DEFAULT_SOULS[agent.id] || "Du er en hjelpsom AI-assistent.");
       const contextPrompt = promptFn ? promptFn(client, channel) : systemPrompt;
       const userMessage = `Brief: ${brief}`;
 

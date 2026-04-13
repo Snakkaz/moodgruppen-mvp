@@ -430,10 +430,10 @@ export default function SettingsPage() {
   const enableDemoMode = () => {
     const base = { primaryApiKey: "demo", secondaryApiKey: "demo", soul: "" };
     const demoSettings: AgentSettings = {
-      strategist: { ...base, primaryProvider: "demo", primaryModel: "gemma-3-12b-it", secondaryProvider: "demo", secondaryModel: "gemma-3-4b-it" },
-      content: { ...base, primaryProvider: "demo", primaryModel: "gemma-3-27b-it", secondaryProvider: "demo", secondaryModel: "gemma-3-12b-it" },
-      seo: { ...base, primaryProvider: "demo", primaryModel: "gemma-3-12b-it", secondaryProvider: "demo", secondaryModel: "gemma-3-4b-it" },
-      analyst: { ...base, primaryProvider: "demo", primaryModel: "gemma-4-31b-it", secondaryProvider: "demo", secondaryModel: "gemma-3-12b-it" },
+      strategist: { ...base, primaryProvider: "demo", primaryModel: "gemma-3-4b-it", secondaryProvider: "demo", secondaryModel: "gemma-3-27b-it" },
+      content: { ...base, primaryProvider: "demo", primaryModel: "gemma-3-27b-it", secondaryProvider: "demo", secondaryModel: "gemma-4-31b-it" },
+      seo: { ...base, primaryProvider: "demo", primaryModel: "gemma-3-4b-it", secondaryProvider: "demo", secondaryModel: "gemma-3-27b-it" },
+      analyst: { ...base, primaryProvider: "demo", primaryModel: "gemma-4-31b-it", secondaryProvider: "demo", secondaryModel: "gemma-3-4b-it" },
     };
     saveAgentSettings(demoSettings);
     setAgentSettings(demoSettings);
