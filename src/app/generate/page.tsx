@@ -13,7 +13,20 @@ export default function GeneratePage() {
   const [copied, setCopied] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => { setClients(getClients()); }, []);
+  useEffect(() => {
+    setClients(getClients());
+    // Restore siste resultat fra localStorage
+    try {
+      const saved = localStorage.getItem("mg-last-result");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        setResults(parsed.results);
+        setClientId(parsed.clientId || "");
+        setChannel(parsed.channel || CHANNELS[0] as string);
+        setBrief(parsed.brief || "");
+      }
+    } catch { /* ignore */ }
+  }, []);
   const client = clients.find(c => c.id === clientId);
 
   const generate = async () => {
@@ -35,6 +48,10 @@ export default function GeneratePage() {
       }
       setResults(data.results);
       if (data.results) {
+        // Lagre siste resultat for restore ved sidebytte
+        localStorage.setItem("mg-last-result", JSON.stringify({
+          results: data.results, clientId: client.id, channel, brief: brief.trim(),
+        }));
         const item: ContentItem = {
           id: crypto.randomUUID(), clientId: client.id, clientName: client.name,
           channel, brief: brief.trim(), content: JSON.stringify(data.results),
@@ -101,6 +118,14 @@ export default function GeneratePage() {
             <GlassButton variant="primary" size="lg" className="w-full" onClick={generate} disabled={!client || !brief.trim() || loading}>
               {loading ? "Agentene jobber..." : "Start alle agenter"}
             </GlassButton>
+            {results && !loading && (
+              <GlassButton variant="ghost" size="sm" className="w-full" onClick={() => {
+                setResults(null);
+                localStorage.removeItem("mg-last-result");
+              }}>
+                Nullstill resultater
+              </GlassButton>
+            )}
           </GlassCard>
 
           <GlassCard className="p-4">
