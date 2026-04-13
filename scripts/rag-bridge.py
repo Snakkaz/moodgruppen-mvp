@@ -2,7 +2,7 @@
 import chromadb, json, sys, uuid
 
 client = chromadb.PersistentClient(path="/root/.mempalace/palace")
-collection = client.get_collection("mempalace_drawers")
+collection = client.get_collection("moodai_demo")
 
 action = sys.argv[1]  # "search" or "store"
 
