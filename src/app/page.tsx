@@ -21,8 +21,8 @@ const pipelineSteps = [
   {
     title: "Bilde",
     desc: "Midjourney, Gemini — kontekst-tilpassede bilder fra tekst",
-    status: "Planlagt",
-    statusColor: "bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30",
+    status: "Aktiv",
+    statusColor: "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30",
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z" />
@@ -34,8 +34,8 @@ const pipelineSteps = [
   {
     title: "Video",
     desc: "Kling, Veo, Runway — kort video fra bilde + kontekst",
-    status: "Planlagt",
-    statusColor: "bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30",
+    status: "Aktiv",
+    statusColor: "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30",
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" />
@@ -54,9 +54,9 @@ const agentColors: Record<string, { bg: string; border: string; dot: string }> =
 };
 
 const integrations = [
-  { name: "n8n / Make", desc: "Workflow-orkestrering", status: "Planlagt", statusColor: "bg-gray-500/20 text-gray-500 border-gray-500/30" },
-  { name: "Qdrant", desc: "RAG Vektordatabase", status: "Klar", statusColor: "bg-blue-500/20 text-blue-600 dark:text-blue-400 border-blue-500/30" },
-  { name: "Semrush", desc: "SEO-data i sanntid", status: "Planlagt", statusColor: "bg-gray-500/20 text-gray-500 border-gray-500/30" },
+  { name: "n8n / Make", desc: "Workflow-orkestrering", status: "Aktiv", statusColor: "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30" },
+  { name: "Qdrant", desc: "RAG — 995 dokumenter", status: "Aktiv", statusColor: "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30" },
+  { name: "Semrush", desc: "SEO-data i sanntid", status: "Aktiv", statusColor: "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30" },
 ];
 
 export default function Dashboard() {

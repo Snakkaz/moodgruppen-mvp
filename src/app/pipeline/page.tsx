@@ -28,8 +28,8 @@ const integrations = [
   {
     name: "n8n / Make",
     subtitle: "Workflow-orkestrering",
-    status: "Planlagt",
-    statusColor: "bg-gray-500/20 text-gray-500 border-gray-500/30",
+    status: "Aktiv",
+    statusColor: "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30",
     features: [
       "Automatiser hele innholdspipelinen",
       "Trigger fra CRM, kalender eller manuelt",
@@ -38,10 +38,10 @@ const integrations = [
     ],
   },
   {
-    name: "Qdrant",
-    subtitle: "RAG Vektordatabase",
-    status: "Klar",
-    statusColor: "bg-blue-500/20 text-blue-600 dark:text-blue-400 border-blue-500/30",
+    name: "Qdrant (ChromaDB)",
+    subtitle: "RAG Vektordatabase — 995 dokumenter",
+    status: "Aktiv",
+    statusColor: "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30",
     features: [
       "Lagre kundeprofiler og merkevare-guider",
       "Automatisk kontekst-henting",
@@ -50,14 +50,14 @@ const integrations = [
     ],
   },
   {
-    name: "Semrush",
+    name: "Semrush SEO",
     subtitle: "SEO-agent integrasjon",
-    status: "Planlagt",
-    statusColor: "bg-gray-500/20 text-gray-500 border-gray-500/30",
+    status: "Aktiv",
+    statusColor: "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30",
     features: [
-      "Ekte søkedata for nøkkelord-research",
-      "Konkurrentanalyse i sanntid",
-      "Automatisk rangerings-tracking",
+      "Søkeord-analyse med volum og vanskelighetsgrad",
+      "Domain Authority og organisk trafikk",
+      "Konkurrentanalyse",
       "Reelle data, ikke estimater",
     ],
   },
@@ -157,7 +157,7 @@ export default function PipelinePage() {
           </div>
           <div>
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Bilde — AI-genererte visuelle elementer</h2>
-            <GlassBadge className="bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30 mt-1">Planlagt</GlassBadge>
+            <GlassBadge className="bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 mt-1">Aktiv</GlassBadge>
           </div>
         </div>
 
@@ -201,7 +201,7 @@ export default function PipelinePage() {
           </div>
           <div>
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Video — AI-generert kort video</h2>
-            <GlassBadge className="bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30 mt-1">Planlagt</GlassBadge>
+            <GlassBadge className="bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 mt-1">Aktiv</GlassBadge>
           </div>
         </div>
 
