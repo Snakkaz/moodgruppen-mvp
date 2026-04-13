@@ -51,7 +51,10 @@ async function callAI(
       });
       if (!res.ok) return null;
       const data = await res.json();
-      return data.candidates?.[0]?.content?.parts?.[0]?.text || null;
+      // Gemma 4 models return thought parts first — find the non-thought part
+      const parts = data.candidates?.[0]?.content?.parts || [];
+      const textPart = parts.find((p: { thought?: boolean; text?: string }) => !p.thought && p.text) || parts[0];
+      return textPart?.text || null;
     } catch { return null; }
   }
 
@@ -92,7 +95,9 @@ async function callAI(
       });
       if (!res.ok) return null;
       const data = await res.json();
-      return data.candidates?.[0]?.content?.parts?.[0]?.text || null;
+      const parts = data.candidates?.[0]?.content?.parts || [];
+      const textPart = parts.find((p: { thought?: boolean; text?: string }) => !p.thought && p.text) || parts[0];
+      return textPart?.text || null;
     }
 
     // --- DeepSeek ---
