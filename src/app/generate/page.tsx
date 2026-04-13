@@ -156,34 +156,36 @@ export default function GeneratePage() {
             </GlassCard>
           )}
 
-          {results && !loading && agentOrder.map(agentId => {
-            const agentResult = results[agentId];
-            if (!agentResult) return null;
-            const agent = AGENTS.find(a => a.id === agentId);
-            return (
-              <GlassCard key={agentId} className="overflow-hidden">
-                <div className="flex items-center justify-between px-5 py-3 border-b border-white/20 dark:border-white/5">
-                  <div className="flex items-center gap-2">
-                    <span className={`text-[11px] px-2 py-0.5 rounded-full border font-medium ${agent?.color || ""}`}>{agent?.name}</span>
-                  </div>
-                </div>
-                <div className="p-5 space-y-4">
-                  {agentResult.primary && (
-                    <div>
-                      <h3 className="text-sm font-bold text-gray-700 dark:text-gray-200">Primær modell</h3>
-                      <pre className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap font-sans leading-relaxed">{agentResult.primary}</pre>
+          {results && !loading && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {agentOrder.map(agentId => {
+                const agentResult = results[agentId];
+                if (!agentResult) return null;
+                const agent = AGENTS.find(a => a.id === agentId);
+                return (
+                  <GlassCard key={agentId} className="overflow-hidden">
+                    <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/20 dark:border-white/5">
+                      <span className={`text-[11px] px-2 py-0.5 rounded-full border font-medium ${agent?.color || ""}`}>{agent?.name}</span>
                     </div>
-                  )}
-                  {agentResult.secondary && (
-                    <div>
-                      <h3 className="text-sm font-bold text-gray-700 dark:text-gray-200">Sekundær modell</h3>
-                      <pre className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap font-sans leading-relaxed">{agentResult.secondary}</pre>
+                    <div className="p-4 space-y-3 max-h-[400px] overflow-y-auto">
+                      {agentResult.primary && (
+                        <div>
+                          <h3 className="text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">Primaer</h3>
+                          <pre className="text-xs text-gray-700 dark:text-gray-300 whitespace-pre-wrap font-sans leading-relaxed">{agentResult.primary}</pre>
+                        </div>
+                      )}
+                      {agentResult.secondary && (
+                        <div className="pt-2 border-t border-white/15 dark:border-white/5">
+                          <h3 className="text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">Sekundaer</h3>
+                          <pre className="text-xs text-gray-700 dark:text-gray-300 whitespace-pre-wrap font-sans leading-relaxed">{agentResult.secondary}</pre>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              </GlassCard>
-            );
-          })}
+                  </GlassCard>
+                );
+              })}
+            </div>
+          )}
 
           {!results && !loading && !error && (
             <GlassCard className="p-12 flex items-center justify-center">
