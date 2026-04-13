@@ -1,53 +1,54 @@
 import { NextResponse } from 'next/server';
+import { execSync } from 'child_process';
+import path from 'path';
 
-interface Document {
-  id: string;
-  text: string;
-  embedding: number[];
-  metadata: {
-    clientId: string;
-    type: string;
-    createdAt: string;
-  };
-}
-const vectorStore: Document[] = [];
-
-function cosineSimilarity(a: number[], b: number[]): number {
-  const dotProduct = a.reduce((sum, ai, i) => sum + ai * b[i], 0);
-  const magnitudeA = Math.sqrt(a.reduce((sum, ai) => sum + ai * ai, 0));
-  const magnitudeB = Math.sqrt(b.reduce((sum, bi) => sum + bi * bi, 0));
-  return dotProduct / (magnitudeA * magnitudeB);
-}
-
-function generateTFIDFEmbedding(text: string): number[] {
-  // Simple TF-IDF-based embedding for PoC
-  const words = text.toLowerCase().split(/\s+/);
-  const uniqueWords = Array.from(new Set(words));
-  return uniqueWords.map(word => words.filter(w => w === word).length);
-}
+const BRIDGE = path.join(process.cwd(), 'scripts', 'rag-bridge.py');
 
 export async function POST(req: Request) {
-  const body = await req.json();
-  const { id, text, metadata } = body;
-  const embedding = generateTFIDFEmbedding(text);
+  try {
+    const body = await req.json();
+    const { text, metadata } = body;
 
-  vectorStore.push({ id, text, embedding, metadata });
-  return NextResponse.json({ success: true });
+    if (!text || typeof text !== 'string') {
+      return NextResponse.json({ error: 'Tekst er påkrevd' }, { status: 400 });
+    }
+
+    const input = JSON.stringify({ text, metadata: metadata || {} });
+    const result = execSync(`python3 "${BRIDGE}" store`, {
+      input,
+      encoding: 'utf-8',
+      timeout: 15000,
+    });
+
+    return NextResponse.json(JSON.parse(result));
+  } catch (err: unknown) {
+    return NextResponse.json(
+      { error: `RAG lagring feilet: ${err instanceof Error ? err.message : 'ukjent'}` },
+      { status: 500 }
+    );
+  }
 }
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
-  const query = searchParams.get("query");
-  if (!query) return NextResponse.json({ error: "Query parameter is missing" }, { status: 400 });
+  const query = searchParams.get('query');
+  const limit = searchParams.get('limit') || '5';
 
-  const queryEmbedding = generateTFIDFEmbedding(query);
-  const results = vectorStore
-    .map(doc => ({
-      ...doc,
-      similarity: cosineSimilarity(queryEmbedding, doc.embedding)
-    }))
-    .sort((a, b) => b.similarity - a.similarity)
-    .slice(0, 5);
+  if (!query) {
+    return NextResponse.json({ error: 'Query-parameter mangler' }, { status: 400 });
+  }
 
-  return NextResponse.json({ results });
+  try {
+    const result = execSync(
+      `python3 "${BRIDGE}" search ${JSON.stringify(query)} ${limit}`,
+      { encoding: 'utf-8', timeout: 15000 }
+    );
+
+    return NextResponse.json(JSON.parse(result));
+  } catch (err: unknown) {
+    return NextResponse.json(
+      { error: `RAG søk feilet: ${err instanceof Error ? err.message : 'ukjent'}` },
+      { status: 500 }
+    );
+  }
 }

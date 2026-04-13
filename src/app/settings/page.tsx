@@ -130,7 +130,7 @@ const RECOMMENDATIONS: Record<string, { primary: { provider: string; model: stri
   analyst: {
     primary: { provider: "anthropic", model: "claude-opus-4-20250514" },
     secondary: { provider: "deepseek", model: "deepseek-reasoner" },
-    reason: "Opus 4 er best pa kritisk evaluering. DeepSeek Reasoner gir alternativt perspektiv.",
+    reason: "Opus 4 er best på kritisk evaluering. DeepSeek Reasoner gir alternativt perspektiv.",
   },
 };
 
@@ -489,7 +489,7 @@ export default function SettingsPage() {
         </div>
         {configuredCount === 0 && (
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-            Ingen agenter konfigurert. Klikk "Aktiver demo-modus" for a komme i gang med gratis Gemma-modeller, eller konfigurer hver agent manuelt nedenfor.
+            Ingen agenter konfigurert. Klikk "Aktiver demo-modus" for å komme i gang med gratis Gemma-modeller, eller konfigurer hver agent manuelt nedenfor.
           </p>
         )}
       </GlassCard>

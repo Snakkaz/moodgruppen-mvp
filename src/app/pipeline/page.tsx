@@ -20,7 +20,7 @@ const techStack = [
   { name: "6 AI-leverandører", detail: "GitHub, OpenAI, Anthropic, Google, Groq, Ollama" },
   { name: "Glass UI", detail: "Glassmorfisme design" },
   { name: "Parallell AI", detail: "4 agenter samtidig" },
-  { name: "In-memory RAG", detail: "Vektorsok (PoC)" },
+  { name: "In-memory RAG", detail: "Vektorsøk (PoC)" },
   { name: "REST API", detail: "Modulær arkitektur" },
 ];
 
@@ -45,7 +45,7 @@ const integrations = [
     features: [
       "Lagre kundeprofiler og merkevare-guider",
       "Automatisk kontekst-henting",
-      "Semantisk sok i all kundedata",
+      "Semantisk søk i all kundedata",
       "Bedre innhold over tid",
     ],
   },
@@ -91,7 +91,7 @@ export default function PipelinePage() {
           {/* Input box */}
           <GlassCard className="p-4 w-full max-w-md text-center bg-indigo-500/5 dark:bg-indigo-500/10 border border-indigo-500/20">
             <div className="text-sm font-semibold text-gray-900 dark:text-white">Brief + Kundeprofil</div>
-            <div className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">Kanal, tone, malgruppe, merkevare</div>
+            <div className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">Kanal, tone, målgruppe, merkevare</div>
           </GlassCard>
 
           {/* Vertical connector */}
@@ -166,7 +166,7 @@ export default function PipelinePage() {
             <div>
               <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Kontekst inn</h3>
               <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
-                Tekst-innhold, merkevare-profil og visuelle retningslinjer fra Steg 1 brukes til a generere bilder som matcher budskapet.
+                Tekst-innhold, merkevare-profil og visuelle retningslinjer fra Steg 1 brukes til å generere bilder som matcher budskapet.
               </p>
             </div>
             <div>
@@ -210,7 +210,7 @@ export default function PipelinePage() {
             <div>
               <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Kontekst + bilde inn</h3>
               <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
-                Generert bilde + tekst-kontekst brukes som input for a lage kort video tilpasset kanal og merkevare.
+                Generert bilde + tekst-kontekst brukes som input for å lage kort video tilpasset kanal og merkevare.
               </p>
             </div>
             <div>
