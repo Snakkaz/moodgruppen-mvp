@@ -3,28 +3,28 @@ import { AGENTS, DEFAULT_SOULS } from "@/lib/store";
 
 const AGENT_PROMPTS: Record<string, (client: Record<string, string>, channel: string) => string> = {
   strategist: (client, channel) =>
-    `Du er en senior mediestrateg i et norsk markedsforingsbyraa. Analyser kort (2-3 setninger) hvorfor ${channel} er riktig kanal for ${client.name} (${client.industry}) med maalgruppe ${client.audience || "bred"}. Vaer konkret og datadrevet. Skriv paa norsk.`,
+    `Du er en senior mediestrateg i et norsk markedsføringsbyrå. Analyser kort (2-3 setninger) hvorfor ${channel} er riktig kanal for ${client.name} (${client.industry}) med målgruppe ${client.audience || "bred"}. Vær konkret og datadrevet. Skriv på norsk.`,
 
   content: (client, channel) => {
     const channelGuide: Record<string, string> = {
       "Instagram Post": "Skriv en engasjerende Instagram-post (maks 200 ord). Bruk relevante hashtags.",
       "LinkedIn Post": "Skriv en profesjonell LinkedIn-post (200-400 ord). Bruk avsnitt og punktlister.",
-      "Facebook Ad": "Skriv en Facebook-annonse med sterk hook, kort brodtekst og tydelig CTA.",
+      "Facebook Ad": "Skriv en Facebook-annonse med sterk hook, kort brødtekst og tydelig CTA.",
       "Google Ads": "Skriv 3 overskrifter (maks 30 tegn) og 2 beskrivelser (maks 90 tegn).",
       "Blogginnlegg": "Skriv et blogginnlegg (500-800 ord) med overskrifter og struktur.",
     };
-    return `Du er en erfaren innholdsprodusent i et norsk byraa. Skriv innhold for ${client.name} (${client.industry}).
-Tone: ${client.tone}. Maalgruppe: ${client.audience || "Ikke spesifisert"}.
+    return `Du er en erfaren innholdsprodusent i et norsk byrå. Skriv innhold for ${client.name} (${client.industry}).
+Tone: ${client.tone}. Målgruppe: ${client.audience || "Ikke spesifisert"}.
 ${client.guidelines ? `Brand guidelines: ${client.guidelines}` : ""}
 ${channelGuide[channel] || "Skriv tilpasset innhold."}
-Skriv KUN innholdet paa norsk. Ingen meta-tekst.`;
+Skriv KUN innholdet på norsk. Ingen meta-tekst.`;
   },
 
   seo: (client, channel) =>
-    `Du er en SEO-spesialist. Gi 3-5 konkrete SEO-anbefalinger for dette ${channel}-innholdet for ${client.name} (${client.industry}). Inkluder soekeord, metabeskrivelse-forslag og strukturtips. Kort og konkret, maks 150 ord. Skriv paa norsk.`,
+    `Du er en SEO-spesialist. Gi 3-5 konkrete SEO-anbefalinger for dette ${channel}-innholdet for ${client.name} (${client.industry}). Inkluder søkeord, metabeskrivelse-forslag og strukturtips. Kort og konkret, maks 150 ord. Skriv på norsk.`,
 
   analyst: (client, channel) =>
-    `Du er en markedsanalytiker. Gi en kort evaluering (3-4 punkter) av ${channel}-innhold for ${client.name}. Vurder: maalgruppetreff, tone-konsistens, CTA-styrke, og forbedringsforslag. Maks 100 ord. Skriv paa norsk.`,
+    `Du er en markedsanalytiker. Gi en kort evaluering (3-4 punkter) av ${channel}-innhold for ${client.name}. Vurder: målgruppetreff, tone-konsistens, CTA-styrke, og forbedringsforslag. Maks 100 ord. Skriv på norsk.`,
 };
 
 const FETCH_TIMEOUT = 25000;

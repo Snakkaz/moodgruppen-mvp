@@ -76,7 +76,7 @@ export default function Dashboard() {
           Mood<span className="text-indigo-600 dark:text-indigo-400">AI</span>
         </h1>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 mb-5">
-          Multi-agent innholdsplattform for markedsbyraer
+          Multi-agent innholdsplattform for markedsføringsbyråer
         </p>
         <div className="flex gap-3">
           <Link href="/generate">
@@ -136,10 +136,10 @@ export default function Dashboard() {
                 <p className="text-xs text-gray-500 dark:text-gray-400">{agent.desc}</p>
                 <div className="mt-2 flex gap-1.5">
                   <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/50 dark:bg-white/5 border border-white/20 dark:border-white/10 text-gray-500 dark:text-gray-400">
-                    Primaer modell
+                    Primær modell
                   </span>
                   <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/50 dark:bg-white/5 border border-white/20 dark:border-white/10 text-gray-500 dark:text-gray-400">
-                    Sekundaer modell
+                    Sekundær modell
                   </span>
                 </div>
               </GlassCard>
@@ -176,7 +176,7 @@ export default function Dashboard() {
           {[
             { label: "Innhold generert", value: historyCount },
             { label: "Kunder", value: clientCount },
-            { label: "AI-leverandorer", value: 6 },
+            { label: "AI-leverandører", value: 6 },
             { label: "Agenter", value: 4 },
           ].map((stat) => (
             <GlassCard key={stat.label} className="p-4 text-center">

@@ -17,11 +17,11 @@ const techStack = [
   { name: "Next.js", detail: "React framework" },
   { name: "TypeScript", detail: "Type-safe kode" },
   { name: "Tailwind v4", detail: "Utility-first CSS" },
-  { name: "6 AI-leverandorer", detail: "GitHub, OpenAI, Anthropic, Google, Groq, Ollama" },
+  { name: "6 AI-leverandører", detail: "GitHub, OpenAI, Anthropic, Google, Groq, Ollama" },
   { name: "Glass UI", detail: "Glassmorfisme design" },
   { name: "Parallell AI", detail: "4 agenter samtidig" },
   { name: "In-memory RAG", detail: "Vektorsok (PoC)" },
-  { name: "REST API", detail: "Modulaer arkitektur" },
+  { name: "REST API", detail: "Modulær arkitektur" },
 ];
 
 const integrations = [
@@ -55,7 +55,7 @@ const integrations = [
     status: "Planlagt",
     statusColor: "bg-gray-500/20 text-gray-500 border-gray-500/30",
     features: [
-      "Ekte sokedata for nokkelord-research",
+      "Ekte søkedata for nøkkelord-research",
       "Konkurrentanalyse i sanntid",
       "Automatisk rangerings-tracking",
       "Reelle data, ikke estimater",
@@ -113,11 +113,11 @@ export default function PipelinePage() {
                   <div className="space-y-1.5">
                     <div className="flex items-center gap-2">
                       <div className={`w-full h-1 rounded-full ${c.line}`} />
-                      <span className="text-[10px] text-gray-500 dark:text-gray-400 whitespace-nowrap">Primaer AI</span>
+                      <span className="text-[10px] text-gray-500 dark:text-gray-400 whitespace-nowrap">Primær AI</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className={`w-full h-1 rounded-full ${c.line} opacity-50`} />
-                      <span className="text-[10px] text-gray-500 dark:text-gray-400 whitespace-nowrap">Sekundaer AI</span>
+                      <span className="text-[10px] text-gray-500 dark:text-gray-400 whitespace-nowrap">Sekundær AI</span>
                     </div>
                   </div>
                 </GlassCard>
@@ -170,7 +170,7 @@ export default function PipelinePage() {
               </p>
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Leverandorer</h3>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Leverandører</h3>
               <div className="flex flex-wrap gap-1.5">
                 {imageProviders.map((p) => (
                   <span key={p} className="text-[11px] px-2 py-1 rounded-md bg-white/40 dark:bg-white/5 border border-white/20 dark:border-white/10 text-gray-600 dark:text-gray-400">
@@ -214,7 +214,7 @@ export default function PipelinePage() {
               </p>
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Leverandorer</h3>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Leverandører</h3>
               <div className="flex flex-wrap gap-1.5">
                 {videoProviders.map((p) => (
                   <span key={p} className="text-[11px] px-2 py-1 rounded-md bg-white/40 dark:bg-white/5 border border-white/20 dark:border-white/10 text-gray-600 dark:text-gray-400">

@@ -4,7 +4,7 @@ import { getAgentSettings, saveAgentSettings, AGENTS, DEFAULT_SOULS, type AgentS
 import { GlassCard, GlassButton, GlassInput, GlassSelect, GlassTextarea, GlassBadge } from "@/components/ui/glass";
 
 const PROVIDERS = [
-  { id: "", name: "Velg leverandor...", placeholder: "", models: [] },
+  { id: "", name: "Velg leverandør...", placeholder: "", models: [] },
   {
     id: "demo",
     name: "Demo (Gemma — gratis)",
@@ -125,7 +125,7 @@ const RECOMMENDATIONS: Record<string, { primary: { provider: string; model: stri
   seo: {
     primary: { provider: "google", model: "gemini-2.5-pro-preview-06-05" },
     secondary: { provider: "openai", model: "gpt-4.1" },
-    reason: "Gemini Pro har bred sokeforstaelse. GPT-4.1 gir presise nokkelord-anbefalinger.",
+    reason: "Gemini Pro har bred søkeforståelse. GPT-4.1 gir presise nøkkelord-anbefalinger.",
   },
   analyst: {
     primary: { provider: "anthropic", model: "claude-opus-4-20250514" },
@@ -252,7 +252,7 @@ function AgentConfigCard({ agent, config, colors, onUpdate }: {
               </GlassBadge>
             ) : (
               <GlassBadge className="bg-gray-500/10 text-gray-400 border-gray-500/20">
-                Primaer: ikke satt
+                Primær: ikke satt
               </GlassBadge>
             )}
             {hasSecondary ? (
@@ -261,7 +261,7 @@ function AgentConfigCard({ agent, config, colors, onUpdate }: {
               </GlassBadge>
             ) : (
               <GlassBadge className="bg-gray-500/10 text-gray-400 border-gray-500/20">
-                Sekundaer: ikke satt
+                Sekundær: ikke satt
               </GlassBadge>
             )}
           </div>
@@ -293,7 +293,7 @@ function AgentConfigCard({ agent, config, colors, onUpdate }: {
           {/* Primary */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Primaermodell</label>
+              <label className="text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Primærmodell</label>
               <div className="flex items-center gap-2">
                 {statusLabel(primaryStatus, primaryError) && (
                   <span className={`text-[10px] font-medium ${statusLabel(primaryStatus, primaryError)!.color}`}>
@@ -321,11 +321,11 @@ function AgentConfigCard({ agent, config, colors, onUpdate }: {
                 {PROVIDERS.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
               </GlassSelect>
               {config.primaryProvider === "demo" ? (
-                <GlassInput value="Innebygd nokkel" disabled className="opacity-50" />
+                <GlassInput value="Innebygd nøkkel" disabled className="opacity-50" />
               ) : (
                 <GlassInput
                   type="password"
-                  placeholder={primaryProvider?.placeholder || "API-nokkel"}
+                  placeholder={primaryProvider?.placeholder || "API-nøkkel"}
                   value={config.primaryApiKey || ""}
                   onChange={e => onUpdate({ ...config, primaryApiKey: e.target.value })}
                 />
@@ -343,7 +343,7 @@ function AgentConfigCard({ agent, config, colors, onUpdate }: {
           {/* Secondary */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Sekundaermodell</label>
+              <label className="text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Sekundærmodell</label>
               <div className="flex items-center gap-2">
                 {statusLabel(secondaryStatus, secondaryError) && (
                   <span className={`text-[10px] font-medium ${statusLabel(secondaryStatus, secondaryError)!.color}`}>
@@ -371,11 +371,11 @@ function AgentConfigCard({ agent, config, colors, onUpdate }: {
                 {PROVIDERS.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
               </GlassSelect>
               {config.secondaryProvider === "demo" ? (
-                <GlassInput value="Innebygd nokkel" disabled className="opacity-50" />
+                <GlassInput value="Innebygd nøkkel" disabled className="opacity-50" />
               ) : (
                 <GlassInput
                   type="password"
-                  placeholder={secondaryProvider?.placeholder || "API-nokkel"}
+                  placeholder={secondaryProvider?.placeholder || "API-nøkkel"}
                   value={config.secondaryApiKey || ""}
                   onChange={e => onUpdate({ ...config, secondaryApiKey: e.target.value })}
                 />
@@ -453,7 +453,7 @@ export default function SettingsPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Agent-konfigurasjon</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Konfigurer modeller, API-nokler og systemprompt for hver agent
+            Konfigurer modeller, API-nøkler og systemprompt for hver agent
           </p>
         </div>
         {saved && (
@@ -509,7 +509,7 @@ export default function SettingsPage() {
 
       {/* Provider reference */}
       <GlassCard className="p-5">
-        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-4">Leverandor-oversikt (2026)</h3>
+        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-4">Leverandør-oversikt (2026)</h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
           {PROVIDERS.filter(p => p.id).map(p => (
             <div key={p.id} className="p-3 rounded-lg bg-white/30 dark:bg-white/5 border border-white/20 dark:border-white/10">

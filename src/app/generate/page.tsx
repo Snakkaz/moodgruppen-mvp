@@ -170,13 +170,13 @@ export default function GeneratePage() {
                     <div className="p-4 space-y-3 max-h-[400px] overflow-y-auto">
                       {agentResult.primary && (
                         <div>
-                          <h3 className="text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">Primaer</h3>
+                          <h3 className="text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">Primær</h3>
                           <pre className="text-xs text-gray-700 dark:text-gray-300 whitespace-pre-wrap font-sans leading-relaxed">{agentResult.primary}</pre>
                         </div>
                       )}
                       {agentResult.secondary && (
                         <div className="pt-2 border-t border-white/15 dark:border-white/5">
-                          <h3 className="text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">Sekundaer</h3>
+                          <h3 className="text-xs font-bold text-gray-600 dark:text-gray-300 mb-1">Sekundær</h3>
                           <pre className="text-xs text-gray-700 dark:text-gray-300 whitespace-pre-wrap font-sans leading-relaxed">{agentResult.secondary}</pre>
                         </div>
                       )}
