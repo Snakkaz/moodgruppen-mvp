@@ -2,34 +2,26 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
-import { getSettings, AGENTS } from "@/lib/store";
+import { getAgentSettings, AGENTS } from "@/lib/store";
 
 const nav = [
   { href: "/", label: "Dashboard", icon: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0h4" },
   { href: "/clients", label: "Kunder", icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" },
   { href: "/generate", label: "Generer innhold", icon: "M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" },
   { href: "/history", label: "Historikk", icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" },
+  { href: "/pipeline", label: "Pipeline", icon: "M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-1.102-4.555a4 4 0 015.656 0l4 4a4 4 0 01-5.656 5.656l-1.1-1.1" },
   { href: "/settings", label: "Innstillinger", icon: "M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z" },
 ];
-
-const AGENT_MODELS: Record<string, string> = {
-  strategist: "Perplexity + Claude 4.5",
-  content: "Claude Sonnet 4.6",
-  seo: "Gemini 2.5 Pro",
-  analyst: "Claude Opus 4.6",
-};
 
 export default function Sidebar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dark, setDark] = useState(false);
-  const [apiConnected, setApiConnected] = useState(false);
   const [expandAgents, setExpandAgents] = useState(false);
+  const [agentSettings, setAgentSettings] = useState(() => typeof window !== "undefined" ? getAgentSettings() : {});
 
   useEffect(() => {
     setDark(document.documentElement.classList.contains("dark"));
-    const s = typeof window !== "undefined" ? JSON.parse(localStorage.getItem("mg-settings") || "{}") : {};
-    setApiConnected(!!s.apiKey);
   }, []);
 
   const toggleDark = () => {
@@ -58,33 +50,6 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Mobile header */}
-      <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-white/70 dark:bg-black/50 backdrop-blur-xl border-b border-white/20 dark:border-white/5 z-50 flex items-center justify-between px-4">
-        <h1 className="text-lg font-bold text-gray-900 dark:text-white">Mood<span className="text-indigo-600 dark:text-indigo-400">AI</span></h1>
-        <div className="flex items-center gap-2">
-          <button onClick={toggleDark} className="p-2 text-gray-400 dark:text-gray-500">
-            {dark ? (
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/></svg>
-            ) : (
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/></svg>
-            )}
-          </button>
-          <button onClick={() => setMobileOpen(!mobileOpen)} className="p-2 text-gray-500 dark:text-gray-400">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-              {mobileOpen ? <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/> : <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16"/>}
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      {mobileOpen && (
-        <div className="md:hidden fixed inset-0 z-40 bg-black/20" onClick={() => setMobileOpen(false)}>
-          <div className="absolute top-14 left-0 right-0 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border-b border-white/20 p-3" onClick={e => e.stopPropagation()}>
-            <NavLinks />
-          </div>
-        </div>
-      )}
-
       {/* Desktop sidebar */}
       <aside className="fixed left-0 top-0 h-full w-60 bg-white/60 dark:bg-black/30 backdrop-blur-xl border-r border-white/20 dark:border-white/5 flex flex-col z-50 max-md:hidden">
         <div className="px-6 py-5 border-b border-white/20 dark:border-white/5">
@@ -107,28 +72,27 @@ export default function Sidebar() {
 
             {expandAgents && (
               <div className="mt-1 space-y-1.5">
-                {AGENTS.map(a => (
-                  <div key={a.id} className="px-2 py-2 rounded-lg bg-white/30 dark:bg-white/5 border border-white/20 dark:border-white/5">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-semibold text-gray-700 dark:text-gray-300">{a.name}</span>
-                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" title="Klar"/>
+                {AGENTS.map(a => {
+                  const config = agentSettings[a.id] || {};
+                  const configured = config.primaryApiKey && config.secondaryApiKey;
+
+                  return (
+                    <div key={a.id} className="px-2 py-2 rounded-lg bg-white/30 dark:bg-white/5 border border-white/20 dark:border-white/5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-semibold text-gray-700 dark:text-gray-300">{a.name}</span>
+                        <div className={`w-1.5 h-1.5 rounded-full ${configured ? "bg-emerald-400" : "bg-red-400 animate-pulse"}`}/>
+                      </div>
+                      <div className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">
+                        {configured ? `${config.primaryModel || "Primær"} + ${config.secondaryModel || "Sekundær"}` : "Ikke konfigurert"}
+                      </div>
+                      <div className="text-[9px] text-gray-300 dark:text-gray-600 mt-0.5 italic">{a.desc}</div>
                     </div>
-                    <div className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{AGENT_MODELS[a.id]}</div>
-                    <div className="text-[9px] text-gray-300 dark:text-gray-600 mt-0.5 italic">{a.desc}</div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
         </nav>
-
-        {/* API status */}
-        <div className="px-4 py-3 border-t border-white/15 dark:border-white/5">
-          <div className="flex items-center gap-2">
-            <div className={`w-2 h-2 rounded-full ${apiConnected ? "bg-emerald-400" : "bg-red-400 animate-pulse"}`}/>
-            <span className="text-[11px] text-gray-500 dark:text-gray-400">{apiConnected ? "API tilkoblet" : "Ingen API-nøkkel"}</span>
-          </div>
-        </div>
 
         {/* Dark mode toggle */}
         <div className="px-3 py-2 border-t border-white/15 dark:border-white/5">
@@ -141,12 +105,6 @@ export default function Sidebar() {
             )}
             {dark ? "Lyst tema" : "Mørkt tema"}
           </button>
-        </div>
-
-        <div className="px-5 py-2 border-t border-white/15 dark:border-white/5">
-          <a href="https://petersendc.no" target="_blank" rel="noopener" className="text-[10px] text-gray-300 dark:text-gray-600 hover:text-indigo-500 transition-colors">
-            Bygget av Stian Petersen
-          </a>
         </div>
       </aside>
     </>

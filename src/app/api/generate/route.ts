@@ -1,83 +1,136 @@
 import { NextRequest, NextResponse } from "next/server";
+import { AGENTS, DEFAULT_SOULS } from "@/lib/store";
 
 const AGENT_PROMPTS: Record<string, (client: Record<string, string>, channel: string) => string> = {
   strategist: (client, channel) =>
-    `Du er en senior mediestrateg i et norsk markedsføringsbyrå. Analyser kort (2-3 setninger) hvorfor ${channel} er riktig kanal for ${client.name} (${client.industry}) med målgruppe ${client.audience || "bred"}. Vær konkret og datadrevet. Skriv på norsk.`,
+    `Du er en senior mediestrateg i et norsk markedsforingsbyraa. Analyser kort (2-3 setninger) hvorfor ${channel} er riktig kanal for ${client.name} (${client.industry}) med maalgruppe ${client.audience || "bred"}. Vaer konkret og datadrevet. Skriv paa norsk.`,
 
   content: (client, channel) => {
     const channelGuide: Record<string, string> = {
       "Instagram Post": "Skriv en engasjerende Instagram-post (maks 200 ord). Bruk relevante hashtags.",
       "LinkedIn Post": "Skriv en profesjonell LinkedIn-post (200-400 ord). Bruk avsnitt og punktlister.",
-      "Facebook Ad": "Skriv en Facebook-annonse med sterk hook, kort brødtekst og tydelig CTA.",
+      "Facebook Ad": "Skriv en Facebook-annonse med sterk hook, kort brodtekst og tydelig CTA.",
       "Google Ads": "Skriv 3 overskrifter (maks 30 tegn) og 2 beskrivelser (maks 90 tegn).",
       "Blogginnlegg": "Skriv et blogginnlegg (500-800 ord) med overskrifter og struktur.",
     };
-    return `Du er en erfaren innholdsprodusent i et norsk markedsføringsbyrå. Skriv innhold for ${client.name} (${client.industry}).
-Tone of voice: ${client.tone}. Målgruppe: ${client.audience || "Ikke spesifisert"}.
+    return `Du er en erfaren innholdsprodusent i et norsk markedsforingsbyraa. Skriv innhold for ${client.name} (${client.industry}).
+Tone of voice: ${client.tone}. Maalgruppe: ${client.audience || "Ikke spesifisert"}.
 ${client.guidelines ? `Brand guidelines: ${client.guidelines}` : ""}
 ${channelGuide[channel] || "Skriv tilpasset innhold."}
-Skriv KUN innholdet på norsk med korrekt æøå. Ingen meta-tekst eller forklaringer.`;
+Skriv KUN innholdet paa norsk. Ingen meta-tekst eller forklaringer.`;
   },
 
   seo: (client, channel) =>
-    `Du er en SEO-spesialist. Gi 3-5 konkrete SEO-anbefalinger for dette ${channel}-innholdet for ${client.name} (${client.industry}). Inkluder søkeord, metabeskrivelse-forslag og strukturtips. Kort og konkret, maks 150 ord. Skriv på norsk.`,
+    `Du er en SEO-spesialist. Gi 3-5 konkrete SEO-anbefalinger for dette ${channel}-innholdet for ${client.name} (${client.industry}). Inkluder soekeord, metabeskrivelse-forslag og strukturtips. Kort og konkret, maks 150 ord. Skriv paa norsk.`,
 
   analyst: (client, channel) =>
-    `Du er en markedsanalytiker. Gi en kort evaluering (3-4 punkter) av ${channel}-innhold for ${client.name}. Vurder: målgruppetreff, tone-konsistens, CTA-styrke, og forbedringsforslag. Maks 100 ord. Skriv på norsk.`,
+    `Du er en markedsanalytiker. Gi en kort evaluering (3-4 punkter) av ${channel}-innhold for ${client.name}. Vurder: maalgruppetreff, tone-konsistens, CTA-styrke, og forbedringsforslag. Maks 100 ord. Skriv paa norsk.`,
 };
 
-async function callAI(systemPrompt: string, userMessage: string, apiKey: string, model: string, provider: string): Promise<string | null> {
-  const urls: Record<string, string> = {
-    github: "https://models.github.ai/inference/chat/completions",
-    openai: "https://api.openai.com/v1/chat/completions",
-  };
-  const url = urls[provider] || urls.github;
+async function callAI(
+  systemPrompt: string,
+  userMessage: string,
+  apiKey: string,
+  model: string,
+  provider: string
+): Promise<string | null> {
+  if (!apiKey || !model || !provider) {
+    if (provider === "demo" || (!apiKey && process.env.DEMO_GEMINI_KEY)) {
+      const demoKey = process.env.DEMO_GEMINI_KEY;
+      const demoModel = model || "gemma-3-12b-it";
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${demoModel}:generateContent?key=${demoKey}`;
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt + "\n\n" + userMessage }] }] }),
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.candidates?.[0]?.content?.parts?.[0]?.text || null;
+    }
+    return null;
+  }
 
   try {
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-      body: JSON.stringify({
-        model,
-        messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userMessage }],
-        temperature: 0.8,
-        max_tokens: 1500,
-      }),
-    });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data.choices?.[0]?.message?.content || null;
-  } catch { return null; }
+    if (provider === "anthropic") {
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "x-api-key": apiKey,
+          "anthropic-version": "2023-06-01",
+        },
+        body: JSON.stringify({
+          model,
+          max_tokens: 1500,
+          messages: [{ role: "user", content: systemPrompt + "\n\n" + userMessage }],
+        }),
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.content?.[0]?.text || null;
+    }
+
+    if (provider === "google") {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: systemPrompt + "\n\n" + userMessage }] }],
+        }),
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.candidates?.[0]?.content?.parts?.[0]?.text || null;
+    }
+
+    return null;
+  } catch {
+    return null;
+  }
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const { client, channel, brief, settings } = await req.json();
+    const body = await req.json();
+    const { client, channel, brief, agentSettings, testMode, testAgent, testSlot } = body;
 
-    const apiKey = settings?.apiKey || process.env.GITHUB_TOKEN || "";
-    const model = settings?.model || "openai/gpt-4.1-mini";
-    const provider = settings?.provider || "github";
+    const results: Record<string, { primary: string | null; secondary: string | null }> = {};
 
-    if (!apiKey) {
-      return NextResponse.json({ error: "Ingen API-nøkkel. Gå til Innstillinger for å legge til." }, { status: 400 });
-    }
+    const agentsToRun = testMode && testAgent
+      ? AGENTS.filter(a => a.id === testAgent)
+      : AGENTS;
 
-    const results: Record<string, string | null> = {};
+    const promises = agentsToRun.map(async (agent) => {
+      const config = agentSettings?.[agent.id];
+      if (!config) return;
 
-    // Run all agents in parallel
-    const [strategist, content, seo, analyst] = await Promise.all([
-      callAI(AGENT_PROMPTS.strategist(client, channel), `Brief: ${brief}`, apiKey, model, provider),
-      callAI(AGENT_PROMPTS.content(client, channel), brief, apiKey, model, provider),
-      callAI(AGENT_PROMPTS.seo(client, channel), `Kunde: ${client.name}, Bransje: ${client.industry}, Kanal: ${channel}, Brief: ${brief}`, apiKey, model, provider),
-      callAI(AGENT_PROMPTS.analyst(client, channel), `Kanal: ${channel}, Brief: ${brief}, Målgruppe: ${client.audience}`, apiKey, model, provider),
-    ]);
+      const promptFn = AGENT_PROMPTS[agent.id];
+      const systemPrompt = config.soul || DEFAULT_SOULS[agent.id] || "Du er en hjelpsom AI-assistent.";
+      const contextPrompt = promptFn ? promptFn(client, channel) : systemPrompt;
+      const userMessage = `Brief: ${brief}`;
 
-    results.strategist = strategist;
-    results.content = content;
-    results.seo = seo;
-    results.analyst = analyst;
+      if (testMode && testSlot) {
+        if (testSlot === "primary") {
+          const primary = await callAI(contextPrompt, userMessage, config.primaryApiKey, config.primaryModel, config.primaryProvider);
+          results[agent.id] = { primary, secondary: null };
+        } else {
+          const secondary = await callAI(contextPrompt, userMessage, config.secondaryApiKey, config.secondaryModel, config.secondaryProvider);
+          results[agent.id] = { primary: null, secondary };
+        }
+      } else {
+        const [primary, secondary] = await Promise.all([
+          callAI(contextPrompt, userMessage, config.primaryApiKey, config.primaryModel, config.primaryProvider),
+          callAI(contextPrompt, userMessage, config.secondaryApiKey, config.secondaryModel, config.secondaryProvider),
+        ]);
+        results[agent.id] = { primary, secondary };
+      }
+    });
 
-    return NextResponse.json({ results, agents: ["strategist", "content", "seo", "analyst"] });
+    await Promise.all(promises);
+
+    return NextResponse.json({ results });
   } catch (e) {
     console.error("Generate API error:", e);
     return NextResponse.json({ error: "Intern feil" }, { status: 500 });

@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { getClients, getHistory, saveHistory, getSettings, CHANNELS, CHANNEL_COLORS, CHANNEL_ICONS, AGENTS, type Client, type ContentItem } from "@/lib/store";
+import { getClients, getHistory, saveHistory, getSettings, getAgentSettings, CHANNELS, CHANNEL_COLORS, CHANNEL_ICONS, AGENTS, type Client, type ContentItem } from "@/lib/store";
 import { GlassCard, GlassButton, GlassSelect, GlassTextarea } from "@/components/ui/glass";
 
 export default function GeneratePage() {
@@ -8,7 +8,7 @@ export default function GeneratePage() {
   const [clientId, setClientId] = useState("");
   const [channel, setChannel] = useState(CHANNELS[0] as string);
   const [brief, setBrief] = useState("");
-  const [results, setResults] = useState<Record<string, string | null> | null>(null);
+  const [results, setResults] = useState<Record<string, { primary: string | null; secondary: string | null }> | null>(null);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -19,31 +19,37 @@ export default function GeneratePage() {
   const generate = async () => {
     if (!client || !brief.trim()) return;
     setLoading(true); setResults(null); setError(null);
-    const settings = getSettings();
     try {
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ client, channel, brief: brief.trim(), settings }),
+        body: JSON.stringify({ client, channel, brief: brief.trim(), agentSettings: getAgentSettings() }),
       });
       const data = await res.json();
-      if (data.error) { setError(data.error); setLoading(false); return; }
+      if (data.error) {
+        setError(data.error.includes("agent") ?
+          "Ingen agenter er konfigurert. Gå til Innstillinger og aktiver agenter eller prøv demo-modus."
+          : data.error);
+        setLoading(false);
+        return;
+      }
       setResults(data.results);
-      if (data.results?.content) {
+      if (data.results) {
         const item: ContentItem = {
           id: crypto.randomUUID(), clientId: client.id, clientName: client.name,
-          channel, brief: brief.trim(), content: data.results.content,
-          agents: data.agents || [], createdAt: new Date().toISOString(),
+          channel, brief: brief.trim(), content: JSON.stringify(data.results),
+          agents: Object.keys(data.results), createdAt: new Date().toISOString(),
         };
         saveHistory([item, ...getHistory()]);
       }
-    } catch { setError("Kunne ikke koble til AI. Sjekk Innstillinger."); }
+    } catch {
+      setError("Kunne ikke koble til AI. Sjekk Innstillinger eller aktiver demo-modus.");
+    }
     setLoading(false);
   };
 
   const copy = (text: string, key: string) => { navigator.clipboard.writeText(text); setCopied(key); setTimeout(() => setCopied(null), 2000); };
   const agentOrder = ["strategist", "content", "seo", "analyst"];
-  const agentNames: Record<string, string> = { strategist: "Strateg", content: "Innholdsprodusent", seo: "SEO-spesialist", analyst: "Analyseagent" };
 
   return (
     <div>
@@ -112,7 +118,11 @@ export default function GeneratePage() {
         </div>
 
         <div className="lg:col-span-3 space-y-4">
-          {error && <GlassCard className="p-4 border-red-200 dark:border-red-800 text-sm text-red-700 dark:text-red-300">{error}</GlassCard>}
+          {error && (
+            <GlassCard className="p-4 border-red-200 dark:border-red-800 text-sm text-red-700 dark:text-red-300">
+              {error}
+            </GlassCard>
+          )}
 
           {loading && (
             <GlassCard className="p-12 flex flex-col items-center gap-4">
@@ -122,22 +132,29 @@ export default function GeneratePage() {
           )}
 
           {results && !loading && agentOrder.map(agentId => {
-            const content = results[agentId];
-            if (!content) return null;
+            const agentResult = results[agentId];
+            if (!agentResult) return null;
             const agent = AGENTS.find(a => a.id === agentId);
             return (
               <GlassCard key={agentId} className="overflow-hidden">
                 <div className="flex items-center justify-between px-5 py-3 border-b border-white/20 dark:border-white/5">
                   <div className="flex items-center gap-2">
-                    <span className={`text-[11px] px-2 py-0.5 rounded-full border font-medium ${agent?.color || ""}`}>{agentNames[agentId]}</span>
-                    <span className="text-xs text-gray-400 dark:text-gray-500">{content.length} tegn</span>
+                    <span className={`text-[11px] px-2 py-0.5 rounded-full border font-medium ${agent?.color || ""}`}>{agent?.name}</span>
                   </div>
-                  <GlassButton size="sm" onClick={() => copy(content, agentId)}>
-                    {copied === agentId ? "Kopiert!" : "Kopier"}
-                  </GlassButton>
                 </div>
-                <div className="p-5">
-                  <pre className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap font-sans leading-relaxed">{content}</pre>
+                <div className="p-5 space-y-4">
+                  {agentResult.primary && (
+                    <div>
+                      <h3 className="text-sm font-bold text-gray-700 dark:text-gray-200">Primær modell</h3>
+                      <pre className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap font-sans leading-relaxed">{agentResult.primary}</pre>
+                    </div>
+                  )}
+                  {agentResult.secondary && (
+                    <div>
+                      <h3 className="text-sm font-bold text-gray-700 dark:text-gray-200">Sekundær modell</h3>
+                      <pre className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap font-sans leading-relaxed">{agentResult.secondary}</pre>
+                    </div>
+                  )}
                 </div>
               </GlassCard>
             );

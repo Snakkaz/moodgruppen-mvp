@@ -1,36 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MoodAI — Multi-Agent Content Platform
 
-## Getting Started
+AI-drevet innholdsplattform som bruker 4 spesialiserte agenter for å generere markedsføringsinnhold.
 
-First, run the development server:
+## Arkitektur
 
+### Content Pipeline: Tekst → Bilde → Video
+
+**Steg 1: Tekst (Aktiv)**
+- 4 AI-agenter jobber parallelt
+- Hver agent kjører primær + sekundær modell
+- Agenter: Strateg, Innhold, SEO, Analyse
+
+**Steg 2: Bilde (Planlagt)**
+- Kontekst fra tekst → bildegenerering
+- Midjourney, Gemini, DALL-E
+
+**Steg 3: Video (Planlagt)**  
+- Bilde + kontekst → kort video
+- Kling AI, Google Veo, Runway
+
+### Agenter
+
+| Agent | Rolle | Anbefalt modell |
+|-------|-------|-----------------|
+| Strateg | Kanalstrategi og markedsanalyse | Perplexity Sonar Pro |
+| Innhold | Innholdsproduksjon tilpasset tone/kanal | Claude Sonnet 4 |
+| SEO | Søkeoptimalisering og nøkkelord | Gemini 2.5 Pro |
+| Analyse | Evaluering og forbedringsforslag | Claude Opus 4 |
+
+### Støttede AI-leverandører
+- GitHub Models (GPT-4.1, Llama 4, DeepSeek)
+- OpenAI (GPT-4.1, o3, o4)
+- Anthropic (Claude Sonnet 4, Opus 4)
+- Google Gemini (2.5 Pro, 2.5 Flash, Gemma)
+- Groq (Llama 4, QwQ)
+- Perplexity (Sonar Pro, Deep Research)
+- DeepSeek (Chat, Reasoner)
+- xAI (Grok 3)
+- MiniMax (M2)
+- Ollama (lokale modeller)
+
+### Planlagte integrasjoner
+- **n8n/Make** — Workflow-orkestrering
+- **Qdrant** — RAG vektordatabase (PoC klar)
+- **Semrush** — SEO-data i sanntid
+
+## Tech Stack
+- Next.js 16 + TypeScript
+- Tailwind CSS v4
+- Glassmorfisme UI
+- Multi-provider AI med parallell kjøring
+- In-memory RAG (proof-of-concept)
+
+## Demo
+Innebygd demo-modus med Gemma-modeller (gratis). Gå til Innstillinger → "Aktiver demo".
+
+## Kjøring
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev     # utvikling
+npm run build   # produksjon
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Miljøvariabler
+```
+DEMO_GEMINI_KEY=din-gemini-api-nøkkel  # for demo-modus
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Lisens
+Proprietær — Petersen Digital Consulting
