@@ -411,6 +411,204 @@ function AgentConfigCard({ agent, config, colors, onUpdate }: {
   );
 }
 
+const IMAGE_PROVIDERS = [
+  { id: "demo", name: "Demo (Gemini — gratis)", placeholder: "Innebygd", models: [
+    { id: "gemini-2.5-flash-image", name: "Gemini 2.5 Flash Image" },
+    { id: "gemini-3.1-flash-image-preview", name: "Nano Banana 2" },
+    { id: "gemini-3-pro-image-preview", name: "Gemini 3 Pro Image" },
+    { id: "imagen-4.0-generate-001", name: "Imagen 4.0" },
+    { id: "imagen-4.0-fast-generate-001", name: "Imagen 4.0 Fast" },
+  ]},
+  { id: "gemini", name: "Google Gemini", placeholder: "AIzaSy...", models: [
+    { id: "gemini-2.5-flash-image", name: "Gemini 2.5 Flash Image" },
+    { id: "gemini-3.1-flash-image-preview", name: "Nano Banana 2" },
+    { id: "gemini-3-pro-image-preview", name: "Gemini 3 Pro Image" },
+    { id: "imagen-4.0-generate-001", name: "Imagen 4.0" },
+    { id: "imagen-4.0-ultra-generate-001", name: "Imagen 4.0 Ultra" },
+  ]},
+  { id: "dalle", name: "OpenAI DALL-E", placeholder: "sk-xxxx", models: [
+    { id: "dall-e-3", name: "DALL-E 3" },
+  ]},
+];
+
+const VIDEO_PROVIDERS = [
+  { id: "demo", name: "Demo (AI Storyboard — gratis)", placeholder: "Innebygd", models: [
+    { id: "gemma-3-4b-it", name: "Gemma 3 4B" },
+    { id: "gemma-3-27b-it", name: "Gemma 3 27B" },
+    { id: "gemma-4-31b-it", name: "Gemma 4 31B" },
+  ]},
+  { id: "kling", name: "Kling AI", placeholder: "kling-xxxx", models: [
+    { id: "kling-v2", name: "Kling v2" },
+    { id: "kling-v1.6", name: "Kling v1.6" },
+  ]},
+  { id: "runway", name: "Runway", placeholder: "rw-xxxx", models: [
+    { id: "gen-4.5-turbo", name: "Gen 4.5 Turbo" },
+    { id: "gen-4", name: "Gen 4" },
+  ]},
+  { id: "luma", name: "Luma Dream Machine", placeholder: "luma-xxxx", models: [
+    { id: "dream-machine-v2", name: "Dream Machine v2" },
+  ]},
+  { id: "pixverse", name: "PixVerse", placeholder: "pv-xxxx", models: [
+    { id: "pixverse-v3", name: "PixVerse v3" },
+  ]},
+];
+
+function MediaSettingsCard({ mediaSettings, onUpdate }: {
+  mediaSettings: MediaSettings;
+  onUpdate: (ms: MediaSettings) => void;
+}) {
+  const [imgTestStatus, setImgTestStatus] = useState<"idle" | "testing" | "ok" | "error">("idle");
+  const [imgTestMsg, setImgTestMsg] = useState("");
+  const [vidTestStatus, setVidTestStatus] = useState<"idle" | "testing" | "ok" | "error">("idle");
+  const [vidTestMsg, setVidTestMsg] = useState("");
+
+  const imgProvider = IMAGE_PROVIDERS.find(p => p.id === mediaSettings.image.provider) || IMAGE_PROVIDERS[0];
+  const vidProvider = VIDEO_PROVIDERS.find(p => p.id === mediaSettings.video.provider) || VIDEO_PROVIDERS[0];
+
+  const testImage = async () => {
+    setImgTestStatus("testing"); setImgTestMsg("");
+    try {
+      const res = await fetch("/api/image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: "En enkel blå sirkel på hvit bakgrunn",
+          provider: mediaSettings.image.provider,
+          model: mediaSettings.image.model,
+          apiKey: mediaSettings.image.apiKey,
+        }),
+      });
+      const data = await res.json();
+      if (data.image) { setImgTestStatus("ok"); setImgTestMsg("Tilkoblet"); }
+      else { setImgTestStatus("error"); setImgTestMsg(data.error || "Ingen bilde i respons"); }
+    } catch { setImgTestStatus("error"); setImgTestMsg("Nettverksfeil"); }
+    setTimeout(() => { setImgTestStatus("idle"); setImgTestMsg(""); }, 5000);
+  };
+
+  const testVideo = async () => {
+    setVidTestStatus("testing"); setVidTestMsg("");
+    try {
+      const res = await fetch("/api/video", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: "Test av videogenerering", provider: mediaSettings.video.provider, duration: 3 }),
+      });
+      const data = await res.json();
+      if (data.concept || data.videoUrl) { setVidTestStatus("ok"); setVidTestMsg("Tilkoblet"); }
+      else { setVidTestStatus("error"); setVidTestMsg(data.error || "Ingen respons"); }
+    } catch { setVidTestStatus("error"); setVidTestMsg("Nettverksfeil"); }
+    setTimeout(() => { setVidTestStatus("idle"); setVidTestMsg(""); }, 5000);
+  };
+
+  const updateImage = (updates: Partial<typeof mediaSettings.image>) => {
+    const ms = { ...mediaSettings, image: { ...mediaSettings.image, ...updates } };
+    onUpdate(ms);
+  };
+
+  const updateVideo = (updates: Partial<typeof mediaSettings.video>) => {
+    const ms = { ...mediaSettings, video: { ...mediaSettings.video, ...updates } };
+    onUpdate(ms);
+  };
+
+  return (
+    <GlassCard className="p-5 space-y-5">
+      <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">Bilde & Video — API-konfigurasjon</h3>
+
+      {/* Bilde */}
+      <div className="p-4 rounded-lg bg-purple-500/5 dark:bg-purple-500/10 border border-purple-500/20 space-y-3">
+        <div className="flex items-center justify-between">
+          <label className="text-xs font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-wider">Bildegenerering</label>
+          <div className="flex items-center gap-2">
+            {imgTestMsg && (
+              <span className={`text-[10px] font-medium ${imgTestStatus === "ok" ? "text-emerald-500" : imgTestStatus === "error" ? "text-red-500" : "text-amber-500"}`}>
+                {imgTestMsg}
+              </span>
+            )}
+            <GlassButton size="sm" variant="ghost" onClick={testImage} disabled={imgTestStatus === "testing"}>
+              {imgTestStatus === "testing" ? "Tester..." : "Test"}
+            </GlassButton>
+          </div>
+        </div>
+        <div>
+          <label className="block text-[11px] text-gray-500 dark:text-gray-400 mb-1">Leverandør</label>
+          <GlassSelect
+            value={mediaSettings.image.provider}
+            onChange={e => {
+              const prov = IMAGE_PROVIDERS.find(p => p.id === e.target.value) || IMAGE_PROVIDERS[0];
+              updateImage({ provider: e.target.value, model: prov.models[0].id, apiKey: e.target.value === "demo" ? "demo" : "" });
+            }}
+          >
+            {IMAGE_PROVIDERS.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+          </GlassSelect>
+        </div>
+        {mediaSettings.image.provider !== "demo" && (
+          <div>
+            <label className="block text-[11px] text-gray-500 dark:text-gray-400 mb-1">API-nøkkel</label>
+            <GlassInput
+              type="password"
+              placeholder={imgProvider.placeholder}
+              value={mediaSettings.image.apiKey}
+              onChange={e => updateImage({ apiKey: e.target.value })}
+            />
+          </div>
+        )}
+        <div>
+          <label className="block text-[11px] text-gray-500 dark:text-gray-400 mb-1">Modell</label>
+          <GlassSelect value={mediaSettings.image.model} onChange={e => updateImage({ model: e.target.value })}>
+            {imgProvider.models.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
+          </GlassSelect>
+        </div>
+      </div>
+
+      {/* Video */}
+      <div className="p-4 rounded-lg bg-rose-500/5 dark:bg-rose-500/10 border border-rose-500/20 space-y-3">
+        <div className="flex items-center justify-between">
+          <label className="text-xs font-semibold text-rose-600 dark:text-rose-400 uppercase tracking-wider">Videogenerering</label>
+          <div className="flex items-center gap-2">
+            {vidTestMsg && (
+              <span className={`text-[10px] font-medium ${vidTestStatus === "ok" ? "text-emerald-500" : vidTestStatus === "error" ? "text-red-500" : "text-amber-500"}`}>
+                {vidTestMsg}
+              </span>
+            )}
+            <GlassButton size="sm" variant="ghost" onClick={testVideo} disabled={vidTestStatus === "testing"}>
+              {vidTestStatus === "testing" ? "Tester..." : "Test"}
+            </GlassButton>
+          </div>
+        </div>
+        <div>
+          <label className="block text-[11px] text-gray-500 dark:text-gray-400 mb-1">Leverandør</label>
+          <GlassSelect
+            value={mediaSettings.video.provider}
+            onChange={e => {
+              const prov = VIDEO_PROVIDERS.find(p => p.id === e.target.value) || VIDEO_PROVIDERS[0];
+              updateVideo({ provider: e.target.value, model: prov.models[0].id, apiKey: e.target.value === "demo" ? "demo" : "" });
+            }}
+          >
+            {VIDEO_PROVIDERS.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+          </GlassSelect>
+        </div>
+        {mediaSettings.video.provider !== "demo" && (
+          <div>
+            <label className="block text-[11px] text-gray-500 dark:text-gray-400 mb-1">API-nøkkel</label>
+            <GlassInput
+              type="password"
+              placeholder={vidProvider.placeholder}
+              value={mediaSettings.video.apiKey}
+              onChange={e => updateVideo({ apiKey: e.target.value })}
+            />
+          </div>
+        )}
+        <div>
+          <label className="block text-[11px] text-gray-500 dark:text-gray-400 mb-1">Modell</label>
+          <GlassSelect value={mediaSettings.video.model} onChange={e => updateVideo({ model: e.target.value })}>
+            {vidProvider.models.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
+          </GlassSelect>
+        </div>
+      </div>
+    </GlassCard>
+  );
+}
+
 export default function SettingsPage() {
   const [agentSettings, setAgentSettings] = useState<AgentSettings>({});
   const [mediaSettings, setMediaSettings] = useState<MediaSettings>(DEFAULT_MEDIA_SETTINGS);
@@ -510,118 +708,10 @@ export default function SettingsPage() {
       </div>
 
       {/* Bilde & Video innstillinger */}
-      <GlassCard className="p-5 space-y-5">
-        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">Bilde & Video — API-konfigurasjon</h3>
-
-        {/* Bilde */}
-        <div className="space-y-2 p-4 rounded-lg bg-purple-500/5 dark:bg-purple-500/10 border border-purple-500/20">
-          <label className="text-xs font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-wider">Bildegenerering</label>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-            <GlassSelect
-              value={mediaSettings.image.provider}
-              onChange={e => {
-                const ms = { ...mediaSettings, image: { ...mediaSettings.image, provider: e.target.value, apiKey: e.target.value === "demo" ? "demo" : mediaSettings.image.apiKey } };
-                setMediaSettings(ms); saveMediaSettings(ms); setSaved(true); setTimeout(() => setSaved(false), 1500);
-              }}
-            >
-              <option value="demo">Demo (Gemini — gratis)</option>
-              <option value="gemini">Google Gemini</option>
-              <option value="dalle">OpenAI DALL-E</option>
-              <option value="midjourney">Midjourney</option>
-            </GlassSelect>
-            {mediaSettings.image.provider === "demo" ? (
-              <GlassInput value="Innebygd nøkkel" disabled className="opacity-50" />
-            ) : (
-              <GlassInput
-                type="password"
-                placeholder="API-nøkkel"
-                value={mediaSettings.image.apiKey}
-                onChange={e => {
-                  const ms = { ...mediaSettings, image: { ...mediaSettings.image, apiKey: e.target.value } };
-                  setMediaSettings(ms); saveMediaSettings(ms); setSaved(true); setTimeout(() => setSaved(false), 1500);
-                }}
-              />
-            )}
-            <GlassSelect
-              value={mediaSettings.image.model}
-              onChange={e => {
-                const ms = { ...mediaSettings, image: { ...mediaSettings.image, model: e.target.value } };
-                setMediaSettings(ms); saveMediaSettings(ms); setSaved(true); setTimeout(() => setSaved(false), 1500);
-              }}
-            >
-              <optgroup label="Gemini Image">
-                <option value="gemini-2.5-flash-image">Gemini 2.5 Flash Image</option>
-                <option value="gemini-3.1-flash-image-preview">Nano Banana 2 (gemini-3.1-flash)</option>
-                <option value="gemini-3-pro-image-preview">Gemini 3 Pro Image</option>
-              </optgroup>
-              <optgroup label="Imagen">
-                <option value="imagen-4.0-generate-001">Imagen 4.0</option>
-                <option value="imagen-4.0-fast-generate-001">Imagen 4.0 Fast</option>
-                <option value="imagen-4.0-ultra-generate-001">Imagen 4.0 Ultra</option>
-              </optgroup>
-              <optgroup label="Andre">
-                <option value="dall-e-3">DALL-E 3</option>
-              </optgroup>
-            </GlassSelect>
-          </div>
-        </div>
-
-        {/* Video */}
-        <div className="space-y-2 p-4 rounded-lg bg-rose-500/5 dark:bg-rose-500/10 border border-rose-500/20">
-          <label className="text-xs font-semibold text-rose-600 dark:text-rose-400 uppercase tracking-wider">Videogenerering</label>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-            <GlassSelect
-              value={mediaSettings.video.provider}
-              onChange={e => {
-                const ms = { ...mediaSettings, video: { ...mediaSettings.video, provider: e.target.value, apiKey: e.target.value === "demo" ? "demo" : mediaSettings.video.apiKey } };
-                setMediaSettings(ms); saveMediaSettings(ms); setSaved(true); setTimeout(() => setSaved(false), 1500);
-              }}
-            >
-              <option value="demo">Demo (AI Storyboard)</option>
-              <option value="kling">Kling AI</option>
-              <option value="veo">Google Veo 3.1</option>
-              <option value="runway">Runway Gen 4.5</option>
-              <option value="pixverse">PixVerse</option>
-              <option value="luma">Luma Dream Machine</option>
-            </GlassSelect>
-            {mediaSettings.video.provider === "demo" ? (
-              <GlassInput value="Innebygd nøkkel" disabled className="opacity-50" />
-            ) : (
-              <GlassInput
-                type="password"
-                placeholder="API-nøkkel"
-                value={mediaSettings.video.apiKey}
-                onChange={e => {
-                  const ms = { ...mediaSettings, video: { ...mediaSettings.video, apiKey: e.target.value } };
-                  setMediaSettings(ms); saveMediaSettings(ms); setSaved(true); setTimeout(() => setSaved(false), 1500);
-                }}
-              />
-            )}
-            <GlassSelect
-              value={mediaSettings.video.model}
-              onChange={e => {
-                const ms = { ...mediaSettings, video: { ...mediaSettings.video, model: e.target.value } };
-                setMediaSettings(ms); saveMediaSettings(ms); setSaved(true); setTimeout(() => setSaved(false), 1500);
-              }}
-            >
-              <optgroup label="Demo">
-                <option value="gemma-3-4b-it">Gemma 3 4B (storyboard)</option>
-                <option value="gemma-3-27b-it">Gemma 3 27B (storyboard)</option>
-                <option value="gemma-4-31b-it">Gemma 4 31B (storyboard)</option>
-              </optgroup>
-              <optgroup label="Kling">
-                <option value="kling-v2">Kling v2</option>
-              </optgroup>
-              <optgroup label="Google">
-                <option value="veo-3.1">Veo 3.1</option>
-              </optgroup>
-              <optgroup label="Runway">
-                <option value="gen-4.5-turbo">Gen 4.5 Turbo</option>
-              </optgroup>
-            </GlassSelect>
-          </div>
-        </div>
-      </GlassCard>
+      <MediaSettingsCard
+        mediaSettings={mediaSettings}
+        onUpdate={(ms) => { setMediaSettings(ms); saveMediaSettings(ms); setSaved(true); setTimeout(() => setSaved(false), 1500); }}
+      />
 
       {/* Provider reference */}
       <GlassCard className="p-5">
