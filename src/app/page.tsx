@@ -55,7 +55,7 @@ const agentColors: Record<string, { bg: string; border: string; dot: string }> =
 
 const integrations = [
   { name: "n8n / Make", desc: "Workflow-orkestrering", status: "Aktiv", statusColor: "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30" },
-  { name: "Qdrant", desc: "RAG — 995 dokumenter", status: "Aktiv", statusColor: "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30" },
+  { name: "Qdrant", desc: "RAG Vektordatabase", status: "Aktiv", statusColor: "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30" },
   { name: "Semrush", desc: "SEO-data i sanntid", status: "Aktiv", statusColor: "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30" },
 ];
 

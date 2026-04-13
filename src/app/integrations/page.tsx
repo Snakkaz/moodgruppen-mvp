@@ -53,7 +53,7 @@ export default function IntegrationsPage() {
     fetch("/api/rag?query=test&limit=1")
       .then(r => r.json())
       .then(data => {
-        setRagCount(data.totalCount || (data.documents?.length ? 995 : 0));
+        setRagCount(data.totalCount || data.documents?.length || 0);
       })
       .catch(() => {});
   }, []);

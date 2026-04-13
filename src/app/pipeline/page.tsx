@@ -39,7 +39,7 @@ const integrations = [
   },
   {
     name: "Qdrant (ChromaDB)",
-    subtitle: "RAG Vektordatabase — 995 dokumenter",
+    subtitle: "RAG Vektordatabase",
     status: "Aktiv",
     statusColor: "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30",
     features: [
