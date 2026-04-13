@@ -187,37 +187,60 @@ export async function POST(req: NextRequest) {
 
     const results: Record<string, { primary: string | null; secondary: string | null }> = {};
 
-    const agentsToRun = testMode && testAgent
-      ? AGENTS.filter(a => a.id === testAgent)
-      : AGENTS;
+    if (testMode && testAgent) {
+      const agent = AGENTS.find(a => a.id === testAgent);
+      if (!agent) return NextResponse.json({ results });
+      const config = agentSettings?.[agent.id];
+      if (!config) return NextResponse.json({ results });
+      const promptFn = AGENT_PROMPTS[agent.id];
+      const contextPrompt = config.soul || (promptFn ? promptFn(client, channel) : DEFAULT_SOULS[agent.id] || "Du er en hjelpsom AI-assistent.");
+      const userMessage = `Brief: ${brief}`;
+      if (testSlot === "primary") {
+        results[agent.id] = { primary: await callAI(contextPrompt, userMessage, config.primaryApiKey, config.primaryModel, config.primaryProvider), secondary: null };
+      } else {
+        results[agent.id] = { primary: null, secondary: await callAI(contextPrompt, userMessage, config.secondaryApiKey, config.secondaryModel, config.secondaryProvider) };
+      }
+      return NextResponse.json({ results });
+    }
 
-    const promises = agentsToRun.map(async (agent) => {
+    // Fase 1: Kjor strateg, innhold, SEO parallelt
+    const phase1Agents = AGENTS.filter(a => a.id !== "analyst");
+    const phase1Promises = phase1Agents.map(async (agent) => {
       const config = agentSettings?.[agent.id];
       if (!config) return;
-
       const promptFn = AGENT_PROMPTS[agent.id];
-      const systemPrompt = config.soul || (promptFn ? promptFn(client, channel) : DEFAULT_SOULS[agent.id] || "Du er en hjelpsom AI-assistent.");
-      const contextPrompt = promptFn ? promptFn(client, channel) : systemPrompt;
+      const contextPrompt = config.soul || (promptFn ? promptFn(client, channel) : DEFAULT_SOULS[agent.id] || "");
       const userMessage = `Brief: ${brief}`;
-
-      if (testMode && testSlot) {
-        if (testSlot === "primary") {
-          const primary = await callAI(contextPrompt, userMessage, config.primaryApiKey, config.primaryModel, config.primaryProvider);
-          results[agent.id] = { primary, secondary: null };
-        } else {
-          const secondary = await callAI(contextPrompt, userMessage, config.secondaryApiKey, config.secondaryModel, config.secondaryProvider);
-          results[agent.id] = { primary: null, secondary };
-        }
-      } else {
-        const [primary, secondary] = await Promise.all([
-          callAI(contextPrompt, userMessage, config.primaryApiKey, config.primaryModel, config.primaryProvider),
-          callAI(contextPrompt, userMessage, config.secondaryApiKey, config.secondaryModel, config.secondaryProvider),
-        ]);
-        results[agent.id] = { primary, secondary };
-      }
+      const [primary, secondary] = await Promise.all([
+        callAI(contextPrompt, userMessage, config.primaryApiKey, config.primaryModel, config.primaryProvider),
+        callAI(contextPrompt, userMessage, config.secondaryApiKey, config.secondaryModel, config.secondaryProvider),
+      ]);
+      results[agent.id] = { primary, secondary };
     });
+    await Promise.all(phase1Promises);
 
-    await Promise.all(promises);
+    // Fase 2: Analyseagent — faar output fra de andre som kontekst
+    const analystConfig = agentSettings?.analyst;
+    if (analystConfig) {
+      const otherOutput = Object.entries(results)
+        .map(([id, r]) => {
+          const name = AGENTS.find(a => a.id === id)?.name || id;
+          return `[${name}]: ${r.primary || "(ingen output)"}`;
+        })
+        .join("\n\n");
+
+      const analystPrompt = AGENT_PROMPTS.analyst
+        ? AGENT_PROMPTS.analyst(client, channel)
+        : (analystConfig.soul || DEFAULT_SOULS.analyst || "");
+
+      const analystBrief = `Brief: ${brief}\n\n--- Output fra de andre agentene ---\n\n${otherOutput}\n\n--- Evaluer innholdet ovenfor ---`;
+
+      const [primary, secondary] = await Promise.all([
+        callAI(analystPrompt, analystBrief, analystConfig.primaryApiKey, analystConfig.primaryModel, analystConfig.primaryProvider),
+        callAI(analystPrompt, analystBrief, analystConfig.secondaryApiKey, analystConfig.secondaryModel, analystConfig.secondaryProvider),
+      ]);
+      results.analyst = { primary, secondary };
+    }
 
     return NextResponse.json({ results });
   } catch (e) {

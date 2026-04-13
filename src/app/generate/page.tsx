@@ -75,8 +75,8 @@ export default function GeneratePage() {
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">4 AI-agenter samarbeider om å lage optimalt innhold</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-        <div className="lg:col-span-2 space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-1 space-y-4">
           <GlassCard className="p-6 space-y-4">
             <div>
               <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">Kunde</label>
@@ -142,7 +142,7 @@ export default function GeneratePage() {
           </GlassCard>
         </div>
 
-        <div className="lg:col-span-3 space-y-4">
+        <div className="lg:col-span-2 space-y-4">
           {error && (
             <GlassCard className="p-4 border-red-200 dark:border-red-800 text-sm text-red-700 dark:text-red-300">
               {error}
