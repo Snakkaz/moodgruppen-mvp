@@ -3,6 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { getAgentSettings, AGENTS } from "@/lib/store";
+import MoodLogo from "./MoodLogo";
 
 const nav = [
   { href: "/", label: "Dashboard", icon: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0h4" },
@@ -56,9 +57,9 @@ export default function Sidebar() {
     <>
       {/* Desktop sidebar */}
       <aside className="fixed left-0 top-0 h-full w-60 bg-white/60 dark:bg-black/30 backdrop-blur-xl border-r border-white/20 dark:border-white/5 flex flex-col z-50 max-md:hidden">
-        <div className="px-6 py-4 border-b border-white/20 dark:border-white/5">
-          <img src="/logo.jpeg" alt="Mood AI" width={140} height={40} className="dark:brightness-110" style={{ objectFit: "contain" }} />
-          <p className="text-[11px] text-gray-400 mt-1 tracking-wide">Multi-agent innholdsplattform</p>
+        <div className="px-6 py-5 border-b border-white/20 dark:border-white/5">
+          <MoodLogo />
+          <p className="text-[11px] text-gray-400 mt-0.5 tracking-wide">Multi-agent innholdsplattform</p>
         </div>
 
         <nav className="flex-1 py-3 px-3 space-y-0.5 overflow-y-auto">
@@ -114,7 +115,7 @@ export default function Sidebar() {
 
       {/* Mobile header with hamburger */}
       <div className="fixed top-0 left-0 right-0 h-14 bg-white/80 dark:bg-black/50 backdrop-blur-xl border-b border-white/20 dark:border-white/5 flex items-center justify-between px-4 z-50 md:hidden">
-        <img src="/logo.jpeg" alt="Mood AI" width={100} height={28} className="dark:brightness-110" style={{ objectFit: "contain" }} />
+        <MoodLogo size="sm" />
         <button onClick={() => setMobileOpen(!mobileOpen)} className="p-2 rounded-lg hover:bg-white/50 dark:hover:bg-white/10 transition-colors">
           {mobileOpen ? (
             <svg className="w-6 h-6 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
@@ -134,7 +135,7 @@ export default function Sidebar() {
           <div className="fixed inset-0 bg-black/30 z-40 md:hidden" onClick={() => setMobileOpen(false)} />
           <aside className="fixed left-0 top-0 h-full w-64 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-r border-white/20 dark:border-white/5 flex flex-col z-50 md:hidden">
             <div className="px-6 py-5 border-b border-white/20 dark:border-white/5 flex items-center justify-between">
-              <img src="/logo.jpeg" alt="Mood AI" width={140} height={40} className="dark:brightness-110" style={{ objectFit: "contain" }} />
+              <MoodLogo />
               <button onClick={() => setMobileOpen(false)} className="p-1 rounded hover:bg-white/50 dark:hover:bg-white/10">
                 <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />

@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { GlassCard, GlassButton, GlassBadge } from "@/components/ui/glass";
+import MoodLogo from "@/components/MoodLogo";
 import { getClients, getHistory, AGENTS } from "@/lib/store";
 
 const pipelineSteps = [
@@ -72,8 +73,9 @@ export default function Dashboard() {
     <div className="space-y-8">
       {/* Hero */}
       <section>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/logo.jpeg" alt="Mood AI" width={200} height={56} className="dark:brightness-110 mb-2" style={{ objectFit: "contain" }} />
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          <MoodLogo />
+        </h1>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 mb-5">
           Multi-agent innholdsplattform for markedsføringsbyråer
         </p>
