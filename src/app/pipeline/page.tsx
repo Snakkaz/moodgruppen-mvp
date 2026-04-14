@@ -242,6 +242,10 @@ export default function PipelinePage() {
           </div>
         </div>
 
+        {/* Hero image */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/IMG_1495.jpeg" alt="Mood AI — Dedikert AI-arbeidsstasjon" className="w-full rounded-xl border border-white/10 shadow-lg mb-6" />
+
         {/* RAG Explainer */}
         <GlassCard className="p-6 bg-cyan-500/5 dark:bg-cyan-500/10 border border-cyan-500/20 mb-6">
           <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">RAG — Retrieval-Augmented Generation</h3>

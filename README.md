@@ -41,6 +41,10 @@ AI-drevet innholdsplattform som bruker 4 spesialiserte agenter for å generere m
 
 ## Neste steg: Lokal AI-infrastruktur med RAG
 
+<p align="center">
+  <img src="public/IMG_1495.jpeg" alt="Mood AI — Dedikert AI-arbeidsstasjon" width="700" />
+</p>
+
 ### Bakgrunn
 
 Dagens MVP bruker sky-baserte AI-leverandører (OpenAI, Anthropic, etc.). For produksjon hos et markedsføringsbyrå trenger vi:
