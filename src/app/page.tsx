@@ -72,9 +72,8 @@ export default function Dashboard() {
     <div className="space-y-8">
       {/* Hero */}
       <section>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          Mood<span className="text-indigo-600 dark:text-indigo-400">AI</span>
-        </h1>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/logo.jpeg" alt="Mood AI" width={200} height={56} className="dark:brightness-110 mb-2" style={{ objectFit: "contain" }} />
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 mb-5">
           Multi-agent innholdsplattform for markedsføringsbyråer
         </p>
