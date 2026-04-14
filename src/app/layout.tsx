@@ -6,6 +6,18 @@ import { DarkModeInit } from "@/components/DarkModeInit";
 export const metadata: Metadata = {
   title: "MoodAI — Intelligent innholdsproduksjon",
   description: "Multi-agent AI-plattform for markedsføringsbyråer",
+  openGraph: {
+    title: "MoodAI — Intelligent innholdsproduksjon",
+    description: "Multi-agent AI-plattform for markedsføringsbyråer",
+    siteName: "MoodAI",
+    type: "website",
+    url: "https://contentai.petersendc.no",
+  },
+  twitter: {
+    card: "summary",
+    title: "MoodAI — Intelligent innholdsproduksjon",
+    description: "Multi-agent AI-plattform for markedsføringsbyråer",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
